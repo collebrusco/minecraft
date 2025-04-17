@@ -48,7 +48,7 @@ pos_t bpos_to_pos_center(bpos_t const& bpos) {
 
 /** convert absolute position to block position, i.e. the position of the block that the given point lies within. */
 bpos_t pos_to_bpos(pos_t const& pos) {
-    return glm::floor(pos);
+    return static_cast<bpos_t>(glm::floor(pos));
 }
 
 /** convert block position to chunk position, i.e. the position of the chunk that the given block lies within. */
@@ -66,7 +66,7 @@ bpos_t cpos_to_bpos(cpos_t const& cpos, bpos_t const& offset = bpos_t{0,0,0}) {
 }
 
 /** convert absolute pos to chunk pos, i.e. the position of the chunk that the given point lies within */
-cpos_t pos_to_cpos(pos_t const& pos, pos_t) {
+cpos_t pos_to_cpos(pos_t const& pos) {
     return bpos_to_cpos(pos_to_bpos(pos));
 }
 
