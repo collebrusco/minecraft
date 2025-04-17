@@ -1,18 +1,12 @@
 #include <flgl.h>
 #include <flgl/tools.h>
 #include <flgl/logger.h>
+#include "Minecraft.h"
 LOG_MODULE(main);
 
 int main() {
-	gl.init();
-	window.create("hello window", 1280, 720);
-	
-	while (!window.should_close()) {
-
-		window.update();
-	}
-
-	gl.destroy();
-	
+	Driver* mc = new Minecraft();
+	mc->start();
+	delete mc;
 	return 0;
 }
