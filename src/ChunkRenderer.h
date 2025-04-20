@@ -9,6 +9,15 @@
 #include <flgl.h>
 #include "Chunk.h"
 
+typedef enum {
+    TOP     = 0,
+    BOT     = 1,
+    NORTH   = 2,
+    SOUTH   = 3,
+    EAST    = 4,
+    WEST    = 5
+} orientation_e;
+
 struct ChunkRenderer {
 
     static VertexArray vao;
@@ -32,6 +41,7 @@ struct ChunkRenderer {
     void render() const;
 
     void emit_cube(int x, int y, int z);
+    void emit_face(orientation_e o, int x, int y, int z);
 };
 
 

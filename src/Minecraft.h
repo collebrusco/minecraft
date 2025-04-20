@@ -27,6 +27,8 @@ struct Minecraft : public Driver {
     
     ChunkRenderer crenderer;
 
+    TextRenderer debug;
+
 };
 
 

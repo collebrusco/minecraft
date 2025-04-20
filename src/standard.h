@@ -32,6 +32,8 @@ bpos_t cpos_to_bpos(cpos_t const& cpos, bpos_t const& offset = bpos_t{0,0,0});
 cpos_t pos_to_cpos(pos_t const& pos);
 pos_t cpos_to_pos(cpos_t const& cpos, pos_t const& offset = pos_t{0.,0.,0.});
 
+bool bpos_local(bpos_t const& bpos);
+
 #define V3_UP      (glm::vec3{ 0.f, 1.f, 0.f})
 #define V3_DOWN    (glm::vec3{ 0.f,-1.f, 0.f})
 #define V3_NORTH   (glm::vec3{ 0.f, 0.f, 1.f})

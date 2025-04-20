@@ -23,6 +23,10 @@ void Minecraft::user_create() {
         }
     }
 
+    TextRenderer::init_text_rendering();
+    debug.init();
+    debug.set_text("cam at %.1f, %.1f, %.1f", camera.readPos().x, camera.readPos().y, camera.readPos().z);
+
     ChunkRenderer::init_chunk_rendering();
     crenderer.init();
     crenderer.update(chunk);
@@ -77,8 +81,14 @@ void Minecraft::user_render() {
     crenderer.update(chunk);
     crenderer.sync(camera);
     crenderer.render();
+
+    debug.set_text("cam at %.1f, %.1f, %.1f", camera.readPos().x, camera.readPos().y, camera.readPos().z);
+    debug.set_color(vec3{1.,1.,1.});
+    debug.render(10, 45, 5);
 }
 
 void Minecraft::user_destroy() {
+    debug.destroy();
+    TextRenderer::destroy_text_rendering();
     ChunkRenderer::destroy_chunk_rendering();
 }

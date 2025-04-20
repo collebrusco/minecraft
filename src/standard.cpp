@@ -41,4 +41,7 @@ pos_t cpos_to_pos(cpos_t const& cpos, pos_t const& offset) {
     return bpos_to_pos(cpos_to_bpos(cpos)) + offset;
 }
 
-
+bool bpos_local(bpos_t const &bpos) {
+    return (bpos.x >= 0) && (bpos.y >= 0) && (bpos.z >= 0) &&
+           (bpos.x < CHUNK_SIZE) && (bpos.z < CHUNK_SIZE) && bpos.y < MAX_HEIGHT;
+}

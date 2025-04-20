@@ -7,15 +7,6 @@ VertexBuffer<Vt_pun> ChunkRenderer::vbo;
 ElementBuffer ChunkRenderer::ibo;
 Shader ChunkRenderer::shader;
 
-typedef enum {
-    TOP     = 0,
-    BOT     = 1,
-    NORTH   = 2,
-    SOUTH   = 3,
-    EAST    = 4,
-    WEST    = 5
-} orientation_e;
-
 #define HEIGHT_BITS (8)
 #define X_BITS      (4)
 #define Y_BITS      (4)
@@ -95,10 +86,45 @@ void ChunkRenderer::update(Chunk const &chunk) {
     for (int y = 0; y < MAX_HEIGHT; y++) {
         for (int z = 0; z < CHUNK_SIZE; z++) {
             for (int x = 0; x < CHUNK_SIZE; x++) {
-                bpos_t local{x,y,z};
+                const bpos_t local{x,y,z};
                 Block const* b = chunk.blockAt(local);
                 if (b && !b->empty()) {
-                    emit_cube(x,y,z);
+                    bpos_t near = local;
+                    near += V3_UP;
+                    Block const* test = chunk.blockAt(near);
+                    if (!bpos_local(near) || test->empty()) {
+                        emit_face(TOP, local.x, local.y, local.z);
+                    }
+                    near = local;
+                    near += V3_DOWN;
+                    test = chunk.blockAt(near);
+                    if (!bpos_local(near) || test->empty()) {
+                        emit_face(BOT, local.x, local.y, local.z);
+                    }
+                    near = local;
+                    near += V3_EAST;
+                    test = chunk.blockAt(near);
+                    if (!bpos_local(near) || test->empty()) {
+                        emit_face(EAST, local.x, local.y, local.z);
+                    }
+                    near = local;
+                    near += V3_WEST;
+                    test = chunk.blockAt(near);
+                    if (!bpos_local(near) || test->empty()) {
+                        emit_face(WEST, local.x, local.y, local.z);
+                    }
+                    near = local;
+                    near += V3_NORTH;
+                    test = chunk.blockAt(near);
+                    if (!bpos_local(near) || test->empty()) {
+                        emit_face(NORTH, local.x, local.y, local.z);
+                    }
+                    near = local;
+                    near += V3_SOUTH;
+                    test = chunk.blockAt(near);
+                    if (!bpos_local(near) || test->empty()) {
+                        emit_face(SOUTH, local.x, local.y, local.z);
+                    }
                 }
             }
         }
@@ -132,4 +158,9 @@ void ChunkRenderer::emit_cube(int sx, int sy, int sz) {
     instance_data.push_back((instance_u){.f.x = x, .f.height = y, .f.y = z, .f.orientation = SOUTH}.val);
     instance_data.push_back((instance_u){.f.x = x, .f.height = y, .f.y = z, .f.orientation = EAST}.val);
     instance_data.push_back((instance_u){.f.x = x, .f.height = y, .f.y = z, .f.orientation = WEST}.val);
+}
+
+void ChunkRenderer::emit_face(orientation_e o, int sx, int sy, int sz) {
+    uint32_t x = sx; uint32_t y = sy; uint32_t z = sz;
+    instance_data.push_back((instance_u){.f.x = x, .f.height = y, .f.y = z, .f.orientation = o}.val);
 }
