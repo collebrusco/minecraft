@@ -21,6 +21,8 @@ typedef enum {
 #define ORIENT_BITS (3)
 #define TEX_BITS (32 - HEIGHT_BITS - X_BITS - Y_BITS - ORIENT_BITS)
 static_assert((HEIGHT_BITS + X_BITS + Y_BITS + ORIENT_BITS + TEX_BITS) == 32);
+static_assert((1<<X_BITS) == (1<<Y_BITS) && (1<<X_BITS) == CHUNK_SIZE);
+static_assert((1<<HEIGHT_BITS) == MAX_HEIGHT);
 
 union instance_u {
     struct _PACKED_ instance_data {
@@ -33,8 +35,6 @@ union instance_u {
     static_assert(sizeof(instance_data) == sizeof(uint32_t));
     uint32_t val;
 };
-static_assert((1<<X_BITS) == (1<<Y_BITS) && (1<<X_BITS) == CHUNK_SIZE);
-static_assert((1<<HEIGHT_BITS) == MAX_HEIGHT);
 
 void ChunkRenderer::init_chunk_rendering() {
 
@@ -90,6 +90,7 @@ void ChunkRenderer::attach() const {
 void ChunkRenderer::update(Chunk const &chunk) {
 
     /** TODO: big face algo! */
+    instance_data.push_back((instance_u){.val = 0}.val);
 
     instance_buffer.bind();
     instance_buffer.buffer(instance_data);
