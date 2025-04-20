@@ -13,17 +13,28 @@ Minecraft::Minecraft() {
 
 
 void Minecraft::user_create() {
-    
+    gl.init();
+    window.create("minecraft", 1280, 720);
+
+    ChunkRenderer::init_chunk_rendering();
+    crenderer.init();
+    crenderer.update(chunk);
+    crenderer.attach();
 }
 
 void Minecraft::user_update(float dt, Keyboard const& kb, Mouse const& mouse) {
-
+    if (window.keyboard[GLFW_KEY_ESCAPE].down) this->close();
+    
+    camera.update();
 }
 
 void Minecraft::user_render() {
+    gl.clear();
 
+    crenderer.sync(camera);
+    crenderer.render();
 }
 
 void Minecraft::user_destroy() {
-
+    ChunkRenderer::destroy_chunk_rendering();
 }

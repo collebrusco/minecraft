@@ -28,6 +28,8 @@ struct ChunkRenderer {
     void attach() const;
     void update(Chunk const& chunk);
     void sync(Camera const& cam);
+
+    void render() const;
 };
 
 

@@ -98,4 +98,11 @@ void ChunkRenderer::update(Chunk const &chunk) {
 }
 void ChunkRenderer::sync(Camera const& cam) {
     shader.uViewProj(cam.view(), cam.proj());
+    shader.uMat4("uModel", glm::identity<glm::mat4>());
+}
+
+void ChunkRenderer::render() const {
+    vao.bind();
+    shader.bind();
+    gl.draw_vao_ibo_instanced(ibo, instance_data.size());
 }

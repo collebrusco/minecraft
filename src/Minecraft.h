@@ -10,6 +10,7 @@
 #include <flgl/glm.h>
 #include "standard.h"
 #include "Chunk.h"
+#include "ChunkRenderer.h"
 
 
 struct Minecraft : public Driver {
@@ -21,6 +22,10 @@ struct Minecraft : public Driver {
     virtual void user_destroy() override final;
 
     PerspectiveCamera camera;
+
+    Chunk chunk;
+    
+    ChunkRenderer crenderer;
 
 };
 

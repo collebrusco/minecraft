@@ -7,8 +7,5 @@ in vec3 iPos;
 in vec3 iNorm;
 
 void main(){
-    vec2 coord = iUV - vec2(0.5);
-    if(length(coord) > 0.5)
-        discard;
     outColor = vec4(vec3(1.),0.);
 }
