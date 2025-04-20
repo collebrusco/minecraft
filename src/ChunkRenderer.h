@@ -30,6 +30,8 @@ struct ChunkRenderer {
     void sync(Camera const& cam);
 
     void render() const;
+
+    void emit_cube(int x, int y, int z);
 };
 
 

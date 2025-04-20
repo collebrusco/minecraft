@@ -37,15 +37,17 @@ union instance_u {
     uint32_t val;
 };
 
+#define QUAD (0.51)
+
 void ChunkRenderer::init_chunk_rendering() {
 
     shader = Shader::from_source("chunk_vert", "chunk_frag");
 
     const Vt_pun verts[] = {
-        {{-0.5f,-0.5f,-0.5f}, {0.,0.}, {0.,0.,-1.}},
-        {{-0.5f, 0.5f,-0.5f}, {0.,1.}, {0.,0.,-1.}},
-        {{ 0.5f, 0.5f,-0.5f}, {1.,1.}, {0.,0.,-1.}},
-        {{ 0.5f,-0.5f,-0.5f}, {1.,0.}, {0.,0.,-1.}}
+        {{-QUAD,-QUAD,-QUAD}, {0.,0.}, {0.,0.,-1.}},
+        {{-QUAD, QUAD,-QUAD}, {0.,1.}, {0.,0.,-1.}},
+        {{ QUAD, QUAD,-QUAD}, {1.,1.}, {0.,0.,-1.}},
+        {{ QUAD,-QUAD,-QUAD}, {1.,0.}, {0.,0.,-1.}}
     };
 
     const uint32_t elems[] = {
@@ -89,14 +91,18 @@ void ChunkRenderer::attach() const {
 }
 
 void ChunkRenderer::update(Chunk const &chunk) {
-
-    /** TODO: big face algo! */
-    instance_data.push_back((instance_u){.f.orientation = TOP}.val);
-    instance_data.push_back((instance_u){.f.orientation = BOT}.val);
-    instance_data.push_back((instance_u){.f.orientation = NORTH}.val);
-    instance_data.push_back((instance_u){.f.orientation = SOUTH}.val);
-    instance_data.push_back((instance_u){.f.orientation = EAST}.val);
-    instance_data.push_back((instance_u){.f.orientation = WEST}.val);
+    instance_data.clear();
+    for (int y = 0; y < MAX_HEIGHT; y++) {
+        for (int z = 0; z < CHUNK_SIZE; z++) {
+            for (int x = 0; x < CHUNK_SIZE; x++) {
+                bpos_t local{x,y,z};
+                Block const* b = chunk.blockAt(local);
+                if (b && !b->empty()) {
+                    emit_cube(x,y,z);
+                }
+            }
+        }
+    }
 
     instance_buffer.bind();
     instance_buffer.buffer(instance_data);
@@ -112,7 +118,18 @@ void ChunkRenderer::render() const {
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
+    gl.enable_depth_test();
     vao.bind();
     shader.bind();
     gl.draw_vao_ibo_instanced(ibo, instance_data.size());
+}
+
+void ChunkRenderer::emit_cube(int sx, int sy, int sz) {
+    uint32_t x = sx; uint32_t y = sy; uint32_t z = sz;
+    instance_data.push_back((instance_u){.f.x = x, .f.height = y, .f.y = z, .f.orientation = TOP}.val);
+    instance_data.push_back((instance_u){.f.x = x, .f.height = y, .f.y = z, .f.orientation = BOT}.val);
+    instance_data.push_back((instance_u){.f.x = x, .f.height = y, .f.y = z, .f.orientation = NORTH}.val);
+    instance_data.push_back((instance_u){.f.x = x, .f.height = y, .f.y = z, .f.orientation = SOUTH}.val);
+    instance_data.push_back((instance_u){.f.x = x, .f.height = y, .f.y = z, .f.orientation = EAST}.val);
+    instance_data.push_back((instance_u){.f.x = x, .f.height = y, .f.y = z, .f.orientation = WEST}.val);
 }

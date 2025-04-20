@@ -17,6 +17,12 @@ void Minecraft::user_create() {
     gl.init();
     window.create("minecraft", 1280, 720);
 
+    for (int x = 0; x < 16; x++) {
+        for (int z = 0; z < 16; z++) {
+            chunk.blockAt(bpos_t{x, 3, z})->type = &Blocks::stone;
+        }
+    }
+
     ChunkRenderer::init_chunk_rendering();
     crenderer.init();
     crenderer.update(chunk);
@@ -34,7 +40,10 @@ void Minecraft::user_update(float dt, Keyboard const& kb, Mouse const& mouse) {
     vec3 move = vec3(0.);
     vec3 fwd = camera.readLook(); fwd.y = 0;
     vec3 rht = cross(camera.readLook(), camera.readUp());
-    const float speed = 2.;
+    float speed = 2.;
+    if (window.keyboard[GLFW_KEY_TAB].down) {
+        speed *= 10.;
+    }
     if (window.keyboard[GLFW_KEY_W].down) {
         move += fwd;
     }
@@ -65,6 +74,7 @@ void Minecraft::user_render() {
     gl.set_clear_color(0.23, 0.01, 0.33);
     gl.clear();
 
+    crenderer.update(chunk);
     crenderer.sync(camera);
     crenderer.render();
 }

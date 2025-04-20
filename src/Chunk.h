@@ -22,13 +22,14 @@ private:
 struct Block {
     BlockType const* type;
     Block(BlockType const*const type = 0);
-    inline bool empty() const {return type;}
+    inline bool empty() const {return !type;}
 };
 
 struct BlockStore {
-    BlockStore() = default;
+    BlockStore();
     Block* get(bpos_t local);
     Block const* read(bpos_t local) const;
+    static size_t n();
 private:
     static size_t flatten_idx(bpos_t local);
     Block data[CHUNK_SIZE * CHUNK_SIZE * MAX_HEIGHT];

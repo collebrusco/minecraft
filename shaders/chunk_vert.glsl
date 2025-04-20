@@ -68,14 +68,18 @@ void main() {
 
     Instance instance;
     instance.orientation = (aInstance >> 16u) & 0x7u;
+    instance.x = float(aInstance & 0xFu);
+    instance.z = float((aInstance >> 4) & 0xFu);
+    instance.y = float((aInstance >> 8) & 0xFFu);
 
-    vec3 rPos = rotate_by_orient(aPos, instance.orientation);
+
+    vec3 rPos = rotate_by_orient(aPos, instance.orientation) + vec3(instance.x, instance.y, instance.z);
     vec3 rNorm = normal_from_orient(instance.orientation);
 
     vec3 worldPos = rPos;
 
     iUV = aUV;
-    iPos = rPos;
+    iPos = worldPos;
     iNorm = rNorm;
-    gl_Position = uProj * uView * uModel * vec4(iPos, 1.0f);
+    gl_Position = uProj * uView * uModel * vec4(worldPos, 1.0f);
 }

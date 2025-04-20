@@ -1,5 +1,13 @@
 #include "Chunk.h"
 
+BlockStore::BlockStore() {
+    for (size_t i = 0; i < BlockStore::n(); i++) {
+        data[i] = Block();
+    }
+}
+
+size_t BlockStore::n() {return CHUNK_SIZE * CHUNK_SIZE * MAX_HEIGHT;}
+
 Block *BlockStore::get(bpos_t local) {
     return &this->data[flatten_idx(local)];
 }
@@ -19,13 +27,11 @@ Block::Block(BlockType const *const typ) : type(typ) {
 
 Block *Chunk::blockAt(bpos_t local) {
     Block* b = this->store.get(local);
-    if (b->empty()) return 0;
     return b;
 }
 
 Block const *Chunk::blockAt(bpos_t local) const {
     Block const* b = this->store.read(local);
-    if (b->empty()) return 0;
     return b;
 }
 
