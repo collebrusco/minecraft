@@ -1,4 +1,5 @@
 #include "ChunkRenderer.h"
+using namespace glm;
 LOG_MODULE(crend);
 
 VertexArray ChunkRenderer::vao;
@@ -90,7 +91,12 @@ void ChunkRenderer::attach() const {
 void ChunkRenderer::update(Chunk const &chunk) {
 
     /** TODO: big face algo! */
-    instance_data.push_back((instance_u){.val = 0}.val);
+    instance_data.push_back((instance_u){.f.orientation = TOP}.val);
+    instance_data.push_back((instance_u){.f.orientation = BOT}.val);
+    instance_data.push_back((instance_u){.f.orientation = NORTH}.val);
+    instance_data.push_back((instance_u){.f.orientation = SOUTH}.val);
+    instance_data.push_back((instance_u){.f.orientation = EAST}.val);
+    instance_data.push_back((instance_u){.f.orientation = WEST}.val);
 
     instance_buffer.bind();
     instance_buffer.buffer(instance_data);
@@ -99,9 +105,13 @@ void ChunkRenderer::update(Chunk const &chunk) {
 void ChunkRenderer::sync(Camera const& cam) {
     shader.uViewProj(cam.view(), cam.proj());
     shader.uMat4("uModel", glm::identity<glm::mat4>());
+    shader.uVec3("uLightdir", glm::normalize(vec3{-1., -8., -2.}));
 }
 
 void ChunkRenderer::render() const {
+    glFrontFace(GL_CW);
+    glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
     vao.bind();
     shader.bind();
     gl.draw_vao_ibo_instanced(ibo, instance_data.size());

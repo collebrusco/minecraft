@@ -21,7 +21,7 @@ struct Minecraft : public Driver {
     virtual void user_render() override final;
     virtual void user_destroy() override final;
 
-    PerspectiveCamera camera;
+    MousePerspectiveCamera camera;
 
     Chunk chunk;
     
