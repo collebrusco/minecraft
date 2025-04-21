@@ -11,7 +11,7 @@
 #include "standard.h"
 #include "Chunk.h"
 #include "ChunkRenderer.h"
-
+#include "util/DebugUI.h"
 
 struct Minecraft : public Driver {
 
@@ -27,7 +27,7 @@ struct Minecraft : public Driver {
     
     ChunkRenderer crenderer;
 
-    TextRenderer debug;
+    DebugUI dbui;
 
 };
 

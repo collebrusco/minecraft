@@ -35,7 +35,8 @@ struct ChunkRenderer {
     void destroy();
 
     void attach() const;
-    void update(Chunk const& chunk);
+    bool update(Chunk const& chunk);
+    void buffer();
     void sync(Camera const& cam);
 
     void render() const;

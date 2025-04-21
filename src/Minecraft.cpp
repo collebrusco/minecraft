@@ -1,5 +1,6 @@
 #include "Minecraft.h"
 #include <flgl/logger.h>
+#include "RNG.h"
 using namespace glm;
 LOG_MODULE(mc);
 
@@ -12,24 +13,23 @@ Minecraft::Minecraft() {
     LOG_INF("world %.0f MB (%.1f GB)", mb * RENDER_DISTANCE_F * RENDER_DISTANCE_F, mb * RENDER_DISTANCE_F * RENDER_DISTANCE_F * (1./1024.));
 }
 
-
 void Minecraft::user_create() {
     gl.init();
     window.create("minecraft", 1280, 720);
 
     for (int x = 0; x < 16; x++) {
         for (int z = 0; z < 16; z++) {
-            chunk.blockAt(bpos_t{x, 3, z})->type = &Blocks::stone;
+            int y = glm::floor(RNG::random_scalar_octave(x, z, 3) * 2.);
+            chunk.blockAt(bpos_t{x, y, z})->type = &Blocks::stone;
         }
     }
 
-    TextRenderer::init_text_rendering();
-    debug.init();
-    debug.set_text("cam at %.1f, %.1f, %.1f", camera.readPos().x, camera.readPos().y, camera.readPos().z);
+    dbui.init();
 
     ChunkRenderer::init_chunk_rendering();
     crenderer.init();
     crenderer.update(chunk);
+    crenderer.buffer();
     crenderer.attach();
 
     camera.enable_look();
@@ -37,6 +37,7 @@ void Minecraft::user_create() {
 }
 
 void Minecraft::user_update(float dt, Keyboard const& kb, Mouse const& mouse) {
+    dbui.tall.start();
     if (window.keyboard[GLFW_KEY_ESCAPE].down) this->close();
     static bool wf = false; if (window.keyboard[GLFW_KEY_K].pressed) wf = !wf;
     gl.wireframe(wf);
@@ -78,17 +79,28 @@ void Minecraft::user_render() {
     gl.set_clear_color(0.23, 0.01, 0.33);
     gl.clear();
 
+        dbui.tcpu.start();
     crenderer.update(chunk);
+        dbui.tcpu.stop();
+        
+        dbui.tbuf.start();
+    crenderer.buffer();
+        glFinish();
+        dbui.tbuf.stop();
     crenderer.sync(camera);
-    crenderer.render();
 
-    debug.set_text("cam at %.1f, %.1f, %.1f", camera.readPos().x, camera.readPos().y, camera.readPos().z);
-    debug.set_color(vec3{1.,1.,1.});
-    debug.render(10, 45, 5);
+        dbui.tren.start();
+    crenderer.render();
+        glFinish();
+        dbui.tren.stop();
+
+        dbui.tall.stop();
+        dbui.tick(dt());
+
 }
 
 void Minecraft::user_destroy() {
-    debug.destroy();
+    dbui.destroy();
     TextRenderer::destroy_text_rendering();
     ChunkRenderer::destroy_chunk_rendering();
 }

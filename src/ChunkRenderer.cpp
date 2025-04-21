@@ -81,7 +81,7 @@ void ChunkRenderer::attach() const {
     instance_buffer.unbind();
 }
 
-void ChunkRenderer::update(Chunk const &chunk) {
+bool ChunkRenderer::update(Chunk const &chunk) {
     instance_data.clear();
     for (int y = 0; y < MAX_HEIGHT; y++) {
         for (int z = 0; z < CHUNK_SIZE; z++) {
@@ -129,12 +129,15 @@ void ChunkRenderer::update(Chunk const &chunk) {
             }
         }
     }
-
+    return true;
+}
+void ChunkRenderer::buffer() {
     instance_buffer.bind();
     instance_buffer.buffer(instance_data);
     instance_buffer.unbind();
 }
-void ChunkRenderer::sync(Camera const& cam) {
+void ChunkRenderer::sync(Camera const &cam)
+{
     shader.uViewProj(cam.view(), cam.proj());
     shader.uMat4("uModel", glm::identity<glm::mat4>());
     shader.uVec3("uLightdir", glm::normalize(vec3{-1., -8., -2.}));
