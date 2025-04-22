@@ -72,7 +72,6 @@ void main() {
     instance.z = float((aInstance >> 4) & 0xFu);
     instance.y = float((aInstance >> 8) & 0xFFu);
 
-
     vec3 rPos = rotate_by_orient(aPos, instance.orientation) + vec3(instance.x, instance.y, instance.z);
     vec3 rNorm = normal_from_orient(instance.orientation);
 

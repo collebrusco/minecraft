@@ -5,7 +5,7 @@ using namespace glm;
 LOG_MODULE(mc);
 
 
-Minecraft::Minecraft() {
+Minecraft::Minecraft() : chunk(cpos_t{0,0}) {
     const float kb = (static_cast<float>(sizeof(Block)) * CHUNK_SIZE_F * CHUNK_SIZE_F * MAX_HEIGHT_F) / 1024.f;
     const float mb = kb / 1024.f;
     LOG_INF("minecraft init");
@@ -17,12 +17,7 @@ void Minecraft::user_create() {
     gl.init();
     window.create("minecraft", 1280, 720);
 
-    for (int x = 0; x < 16; x++) {
-        for (int z = 0; z < 16; z++) {
-            int y = glm::floor(RNG::random_scalar_octave(x, z, 3) * 2.);
-            chunk.blockAt(bpos_t{x, y, z})->type = &Blocks::stone;
-        }
-    }
+    wgen.gen_chunk(cpos_t{0,0}, &chunk);
 
     dbui.init();
 
@@ -33,21 +28,25 @@ void Minecraft::user_create() {
     crenderer.attach();
 
     camera.enable_look();
+    camera.getPos() = vec3{20.f, 16.f, 20.f};
+    camera.getFar() = 300.f;
+    camera.getNear() = 0.01f;
     camera.update();
 }
 
 void Minecraft::user_update(float dt, Keyboard const& kb, Mouse const& mouse) {
+    static bool wf = false;
     dbui.tall.start();
     if (window.keyboard[GLFW_KEY_ESCAPE].down) this->close();
-    static bool wf = false; if (window.keyboard[GLFW_KEY_K].pressed) wf = !wf;
+    if (window.keyboard[GLFW_KEY_K].pressed) wf = !wf;
     gl.wireframe(wf);
 
     vec3 move = vec3(0.);
     vec3 fwd = camera.readLook(); fwd.y = 0;
     vec3 rht = cross(camera.readLook(), camera.readUp());
-    float speed = 2.;
+    float speed = 4.;
     if (window.keyboard[GLFW_KEY_TAB].down) {
-        speed *= 10.;
+        speed *= 3.;
     }
     if (window.keyboard[GLFW_KEY_W].down) {
         move += fwd;
@@ -82,7 +81,7 @@ void Minecraft::user_render() {
         dbui.tcpu.start();
     crenderer.update(chunk);
         dbui.tcpu.stop();
-        
+
         dbui.tbuf.start();
     crenderer.buffer();
         glFinish();
@@ -103,4 +102,5 @@ void Minecraft::user_destroy() {
     dbui.destroy();
     TextRenderer::destroy_text_rendering();
     ChunkRenderer::destroy_chunk_rendering();
+    crenderer.destroy();
 }

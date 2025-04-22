@@ -23,6 +23,8 @@ struct Minecraft : public Driver {
 
     MousePerspectiveCamera camera;
 
+    BasicWorldGen wgen;
+
     Chunk chunk;
     
     ChunkRenderer crenderer;

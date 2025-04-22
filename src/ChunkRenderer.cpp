@@ -28,7 +28,7 @@ union instance_u {
     uint32_t val;
 };
 
-#define QUAD (0.51)
+#define QUAD (0.5)
 
 void ChunkRenderer::init_chunk_rendering() {
 
@@ -136,8 +136,7 @@ void ChunkRenderer::buffer() {
     instance_buffer.buffer(instance_data);
     instance_buffer.unbind();
 }
-void ChunkRenderer::sync(Camera const &cam)
-{
+void ChunkRenderer::sync(Camera const &cam) {
     shader.uViewProj(cam.view(), cam.proj());
     shader.uMat4("uModel", glm::identity<glm::mat4>());
     shader.uVec3("uLightdir", glm::normalize(vec3{-1., -8., -2.}));
