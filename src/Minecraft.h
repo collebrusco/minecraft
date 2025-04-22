@@ -11,6 +11,7 @@
 #include "standard.h"
 #include "Chunk.h"
 #include "ChunkRenderer.h"
+#include "WorldRenderer.h"
 #include "util/DebugUI.h"
 
 struct Minecraft : public Driver {
@@ -25,11 +26,11 @@ struct Minecraft : public Driver {
 
     BasicWorldGen wgen;
 
-    Chunk chunk;
-    ChunkRenderer crenderer;
+    // Chunk chunk;
+    // ChunkRenderer crenderer;
 
-    // World world;
-    // WorldRenderer wrenderer;
+    World world;
+    WorldRenderer wrenderer;
 
     DebugUI dbui;
 

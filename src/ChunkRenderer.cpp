@@ -133,6 +133,7 @@ bool ChunkRenderer::update(Chunk const &chunk) {
     return true;
 }
 void ChunkRenderer::buffer() {
+    VertexArray::unbind();
     instance_buffer.bind();
     instance_buffer.buffer(instance_data);
     instance_buffer.unbind();

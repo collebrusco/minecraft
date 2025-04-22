@@ -5,7 +5,7 @@ using namespace glm;
 LOG_MODULE(mc);
 
 
-Minecraft::Minecraft() : chunk(cpos_t{0,0}) {
+Minecraft::Minecraft() : world(wgen) {
     const float kb = (static_cast<float>(sizeof(Block)) * CHUNK_SIZE_F * CHUNK_SIZE_F * MAX_HEIGHT_F) / 1024.f;
     const float mb = kb / 1024.f;
     LOG_INF("minecraft init");
@@ -17,15 +17,9 @@ void Minecraft::user_create() {
     gl.init();
     window.create("minecraft", 1280, 720);
 
-    wgen.gen_chunk(cpos_t{0,0}, &chunk);
-
     dbui.init();
 
-    ChunkRenderer::init_chunk_rendering();
-    crenderer.init();
-    crenderer.update(chunk);
-    crenderer.buffer();
-    crenderer.attach();
+    wrenderer.init();
 
     camera.enable_look();
     camera.getPos() = vec3{20.f, 16.f, 20.f};
@@ -79,17 +73,21 @@ void Minecraft::user_render() {
     gl.clear();
 
         dbui.tcpu.start();
-    crenderer.update(chunk);
+    LOG_INF("up:");
+    wrenderer.update(world);
         dbui.tcpu.stop();
 
         dbui.tbuf.start();
-    crenderer.buffer();
+    LOG_INF("buf:");
+    wrenderer.buffer(world);
         glFinish();
         dbui.tbuf.stop();
-    crenderer.sync(camera);
+    LOG_INF("sync:");
+    wrenderer.sync(camera);
 
         dbui.tren.start();
-    crenderer.render();
+    LOG_INF("ren:");
+    wrenderer.render();
         glFinish();
         dbui.tren.stop();
 
@@ -102,5 +100,5 @@ void Minecraft::user_destroy() {
     dbui.destroy();
     TextRenderer::destroy_text_rendering();
     ChunkRenderer::destroy_chunk_rendering();
-    crenderer.destroy();
+    wrenderer.destroy();
 }

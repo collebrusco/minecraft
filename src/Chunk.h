@@ -90,24 +90,11 @@ struct World : public ECS<> {
     Chunk const* chunkAt(cpos_t pos) const;
     Block* blockAt(bpos_t pos);
     Block const* blockAt(bpos_t pos) const;
-    inline Chunk** renderdata() const {return (Chunk**)chunks;}
+    inline Chunk*const* renderdata() const {return &chunks[0];}
 private:
     ChunkStore store;
     WorldGenerator& generator;
     Chunk* chunks[RENDER_DISTANCE * RENDER_DISTANCE];
-};
-
-#include "ChunkRenderer.h"
-struct WorldRenderer {
-    ChunkRenderer renderers[RENDER_DISTANCE * RENDER_DISTANCE];
-    void init();
-    void destroy();
-
-    void update(World const& world);
-    void buffer(World const& world);
-    void sync(Camera const& cam);
-
-    void render() const;
 };
 
 #endif /* CHUNK_H */

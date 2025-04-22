@@ -1,5 +1,6 @@
 #include "Chunk.h"
 #include "RNG.h"
+LOG_MODULE(chunk);
 
 Chunk::BlockStore::BlockStore() {
     for (size_t i = 0; i < BlockStore::n(); i++) {
@@ -37,12 +38,13 @@ Block const *Chunk::blockAt(bpos_t local) const {
     return b;
 }
 
-void BasicWorldGen::gen_chunk(cpos_t pos, Chunk *target) const {
+void BasicWorldGen::gen_chunk(cpos_t cpos, Chunk *target) const {
+    bpos_t pos = cpos_to_bpos(cpos);
     for (int i = 0; i < CHUNK_SIZE; i++) {
         for (int j = 0; j < CHUNK_SIZE; j++) {
-            int x = pos.x + i; int z = pos.y + j;
-            int y = glm::floor(RNG::random_scalar_octave(x, z, 3) * 2.);
-            target->blockAt(bpos_t{x, y, z})->type = &Blocks::stone;
+            int x = pos.x + i; int z = pos.z + j;
+            int y = glm::floor(RNG::random_scalar_octave(x, z, 6) * 6.);
+            target->blockAt(bpos_t{i, y, j})->type = &Blocks::stone;
         }
     }
 }
@@ -62,7 +64,7 @@ Chunk *ChunkStore::get(cpos_t pos) {
 
 Chunk *ChunkStore::gen(cpos_t pos, WorldGenerator const &gen) {
     map_it_t it = map.find(pos);
-    if (it == map.end()) return 0;
+    if (it != map.end()) return 0;
     Chunk* chunk = new Chunk(pos);
     map.insert({pos, chunk});
     gen.gen_chunk(pos, chunk);
@@ -81,8 +83,8 @@ Chunk *ChunkStore::get_or_gen(cpos_t pos, WorldGenerator const &gen) {
 World::World(WorldGenerator& g) : generator(g) {
     for (ITER_WORLD_BUFXY(i)) {
         for (ITER_WORLD_BUFXY(j)) {
-            cpos_t pos(i - (CHUNK_SIZE/2) + 1, j - (CHUNK_SIZE/2) + 1);
-            chunks[i] = store.gen(pos, generator);
+            cpos_t pos(i - (RENDER_DISTANCE/2) + 1, j - (RENDER_DISTANCE/2) + 1);
+            chunks[j + i*RENDER_DISTANCE] = store.gen(pos, generator);
         }
     }
 }
@@ -104,55 +106,4 @@ Block *World::blockAt(bpos_t pos) {
 
 Block const *World::blockAt(bpos_t pos) const {
     return nullptr;
-}
-
-void WorldRenderer::init() {
-    ChunkRenderer::init_chunk_rendering();
-    for (ITER_WORLD_BUF(i)) {
-        renderers[i].init();
-    }
-}
-
-void WorldRenderer::destroy() {
-    ChunkRenderer::destroy_chunk_rendering();
-    for (ITER_WORLD_BUF(i)) {
-        renderers[i].destroy();
-    }
-}
-
-void WorldRenderer::update(World const& world) {
-    Chunk** buf = world.renderdata();
-    for (ITER_WORLD_BUF(i)) {
-        if (buf[i]->is_marked()) {
-            renderers[i].update(*(buf[i]));
-        }
-    }
-}
-
-void WorldRenderer::buffer(World const& world) {
-    Chunk** buf = world.renderdata();
-    for (ITER_WORLD_BUF(i)) {
-        if (buf[i]->is_marked()) {
-            buf[i]->mark(false);
-            renderers[i].buffer();
-        }
-    }
-}
-
-void WorldRenderer::sync(Camera const &cam) {
-    ChunkRenderer::shader.bind();
-    ChunkRenderer::shader.uViewProj(cam.view(), cam.proj());
-    Shader::unbind();
-}
-
-void WorldRenderer::render() const {
-    ChunkRenderer::shader.bind();
-    ChunkRenderer::vao.bind();
-    for (ITER_WORLD_BUF(i)) {
-        ChunkRenderer::shader.uMat4("uModel", renderers[i].model);
-        renderers[i].attach();
-        renderers[i].render();
-    }
-    Shader::unbind();
-    VertexArray::unbind();
 }
