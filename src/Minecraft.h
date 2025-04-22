@@ -26,8 +26,10 @@ struct Minecraft : public Driver {
     BasicWorldGen wgen;
 
     Chunk chunk;
-    
     ChunkRenderer crenderer;
+
+    // World world;
+    // WorldRenderer wrenderer;
 
     DebugUI dbui;
 

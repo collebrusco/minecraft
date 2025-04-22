@@ -75,7 +75,16 @@ Chunk *ChunkStore::get_or_gen(cpos_t pos, WorldGenerator const &gen) {
     return r;
 }
 
+#define ITER_WORLD_BUF(iter) int iter = 0; iter < RENDER_DISTANCE * RENDER_DISTANCE; iter++
+#define ITER_WORLD_BUFXY(iter) int iter = 0; iter < RENDER_DISTANCE; iter++
+
 World::World(WorldGenerator& g) : generator(g) {
+    for (ITER_WORLD_BUFXY(i)) {
+        for (ITER_WORLD_BUFXY(j)) {
+            cpos_t pos(i - (CHUNK_SIZE/2) + 1, j - (CHUNK_SIZE/2) + 1);
+            chunks[i] = store.gen(pos, generator);
+        }
+    }
 }
 
 World::~World() {
@@ -97,3 +106,53 @@ Block const *World::blockAt(bpos_t pos) const {
     return nullptr;
 }
 
+void WorldRenderer::init() {
+    ChunkRenderer::init_chunk_rendering();
+    for (ITER_WORLD_BUF(i)) {
+        renderers[i].init();
+    }
+}
+
+void WorldRenderer::destroy() {
+    ChunkRenderer::destroy_chunk_rendering();
+    for (ITER_WORLD_BUF(i)) {
+        renderers[i].destroy();
+    }
+}
+
+void WorldRenderer::update(World const& world) {
+    Chunk** buf = world.renderdata();
+    for (ITER_WORLD_BUF(i)) {
+        if (buf[i]->is_marked()) {
+            renderers[i].update(*(buf[i]));
+        }
+    }
+}
+
+void WorldRenderer::buffer(World const& world) {
+    Chunk** buf = world.renderdata();
+    for (ITER_WORLD_BUF(i)) {
+        if (buf[i]->is_marked()) {
+            buf[i]->mark(false);
+            renderers[i].buffer();
+        }
+    }
+}
+
+void WorldRenderer::sync(Camera const &cam) {
+    ChunkRenderer::shader.bind();
+    ChunkRenderer::shader.uViewProj(cam.view(), cam.proj());
+    Shader::unbind();
+}
+
+void WorldRenderer::render() const {
+    ChunkRenderer::shader.bind();
+    ChunkRenderer::vao.bind();
+    for (ITER_WORLD_BUF(i)) {
+        ChunkRenderer::shader.uMat4("uModel", renderers[i].model);
+        renderers[i].attach();
+        renderers[i].render();
+    }
+    Shader::unbind();
+    VertexArray::unbind();
+}

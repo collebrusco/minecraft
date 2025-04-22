@@ -82,6 +82,7 @@ void ChunkRenderer::attach() const {
 }
 
 bool ChunkRenderer::update(Chunk const &chunk) {
+    model = genModelMat3d(cpos_to_pos(chunk.pos), glm::vec3(0.f), glm::vec3(1.));
     instance_data.clear();
     for (int y = 0; y < MAX_HEIGHT; y++) {
         for (int z = 0; z < CHUNK_SIZE; z++) {
@@ -138,7 +139,7 @@ void ChunkRenderer::buffer() {
 }
 void ChunkRenderer::sync(Camera const &cam) {
     shader.uViewProj(cam.view(), cam.proj());
-    shader.uMat4("uModel", glm::identity<glm::mat4>());
+    shader.uMat4("uModel", model);
     shader.uVec3("uLightdir", glm::normalize(vec3{-1., -8., -2.}));
 }
 

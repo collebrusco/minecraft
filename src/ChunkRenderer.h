@@ -25,6 +25,7 @@ struct ChunkRenderer {
     static ElementBuffer ibo;
     static Shader shader;
 
+    glm::mat4 model;
     std::vector<uint32_t> instance_data;
     InstanceBuffer<iAttr_u32> instance_buffer;
 
