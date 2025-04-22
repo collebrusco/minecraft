@@ -73,20 +73,16 @@ void Minecraft::user_render() {
     gl.clear();
 
         dbui.tcpu.start();
-    LOG_INF("up:");
     wrenderer.update(world);
         dbui.tcpu.stop();
 
         dbui.tbuf.start();
-    LOG_INF("buf:");
     wrenderer.buffer(world);
         glFinish();
         dbui.tbuf.stop();
-    LOG_INF("sync:");
     wrenderer.sync(camera);
 
         dbui.tren.start();
-    LOG_INF("ren:");
     wrenderer.render();
         glFinish();
         dbui.tren.stop();
