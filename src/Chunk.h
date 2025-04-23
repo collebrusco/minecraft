@@ -32,7 +32,9 @@ struct Chunk {
     Block const* blockAt(bpos_t local) const;
     inline void mark(bool m = true) {flag = m;}
     inline bool is_marked() const {return flag;}
+    inline glm::mat4 const& get_model() const {return model;}
 private:
+    const glm::mat4 model;
     bool flag;
     struct BlockStore {
         BlockStore();

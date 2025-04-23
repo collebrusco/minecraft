@@ -25,7 +25,8 @@ size_t Chunk::BlockStore::flatten_idx(bpos_t local) {
 Block::Block(BlockType const *const typ) : type(typ) {
 }
 
-Chunk::Chunk(cpos_t p) : pos(p), flag(true), store() {
+Chunk::Chunk(cpos_t p) : pos(p), model(genModelMat3d(cpos_to_pos(p), glm::vec3(0.f), glm::vec3(1.))), flag(true), store() {
+    
 }
 
 Block *Chunk::blockAt(bpos_t local) {

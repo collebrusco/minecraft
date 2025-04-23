@@ -5,6 +5,8 @@
  */
 #ifndef WORLD_H
 #define WORLD_H
+#include <functional>
+#include <unordered_map>
 #include "standard.h"
 #include "Chunk.h"
 
@@ -23,7 +25,6 @@ struct BasicWorldGen : public WorldGenerator {
     virtual void gen_chunk(cpos_t, Chunk* target) const override final;
 };
 
-#include <functional>
 namespace std {
     template<>
     struct hash<cpos_t> {
@@ -35,18 +36,26 @@ namespace std {
     };
 }
 
-#include <unordered_map>
 struct World : public ECS<> {
     World(WorldGenerator&);
     ~World();
+
     Chunk* chunkAt(cpos_t pos);
     Chunk const* chunkAt(cpos_t pos) const;
     Block* blockAt(bpos_t pos);
     Block const* blockAt(bpos_t pos) const;
+
+    inline cpos_t center() const {return _center;}
+    void shift(int dx, int dy);
+    void shift_to(cpos_t center);
+
     inline Chunk*const* renderdata() const {return &chunks[0];}
 private:
+    static size_t cpos_to_idx(cpos_t cpos);
     struct ChunkStore {
+        ChunkStore() = default;
         ~ChunkStore();
+        NO_COPY_OR_MOVE(ChunkStore);
         typedef std::unordered_map<cpos_t, Chunk*>::iterator map_it_t;
         std::unordered_map<cpos_t, Chunk*> map;
         Chunk* get(cpos_t);
@@ -55,6 +64,7 @@ private:
     };
     ChunkStore store;
     WorldGenerator& generator;
+    cpos_t _center;
     Chunk* chunks[RENDER_DISTANCE * RENDER_DISTANCE];
 };
 

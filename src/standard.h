@@ -17,7 +17,9 @@ typedef size_t blockID;
 #define CHUNK_SIZE_F (static_cast<float>(CHUNK_SIZE))
 #define MAX_HEIGHT (256)
 #define MAX_HEIGHT_F (static_cast<float>(MAX_HEIGHT))
-#define RENDER_DISTANCE (32)
+#define RENDER_DISTANCE_R (16)
+#define RENDER_DISTANCE_MIDPT RENDER_DISTANCE_R
+#define RENDER_DISTANCE (RENDER_DISTANCE_R * 2)
 #define RENDER_DISTANCE_F (static_cast<float>(RENDER_DISTANCE))
 
 typedef glm::vec3  pos_t;   /* absolute floating point position */
@@ -48,6 +50,12 @@ bool bpos_local(bpos_t const& bpos);
 
 static inline int index_mod(int i, int m) {
     const int r = i % m; return (r < 0) ? r + m : r;
+}
+
+static inline glm::ivec2 index_mod(glm::ivec2 i, int m) {
+    const int x = i.x % m;
+    const int y = i.y % m;
+    return glm::ivec2{(x<0)?x+m:x, (y<0)?y+m:y};
 }
 
 static inline glm::ivec3 index_mod(glm::ivec3 i, int m) {

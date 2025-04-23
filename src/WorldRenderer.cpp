@@ -43,7 +43,7 @@ void WorldRenderer::buffer(World const& world) {
 }
 
 void WorldRenderer::sync(Camera const &cam) {
-    renderers[0].sync(cam);
+    ChunkRenderer::sync(cam);
     Shader::unbind();
 }
 

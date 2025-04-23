@@ -5,6 +5,8 @@
 #ifndef DEBUG_UI_H
 #define DEBUG_UI_H
 #include "../standard.h"
+#include "../Chunk.h"
+extern size_t nallocs;
 
 #define DBUISZ (16)
 struct DebugUI {
@@ -20,21 +22,22 @@ struct DebugUI {
     void init() {
         TextRenderer::init_text_rendering();
         text.init();
-        set_text(-1.,-1.,-1.,-1.,-1.);
+        set_text(-1.,-1.,-1.,-1.,-1.,-1.);
     }
     void destroy() {
         text.destroy();
         text.destroy_text_rendering();
     }
 
-    void set_text(double c, double b, double r, double a, double d) {
+    void set_text(double ram, double c, double b, double r, double a, double d) {
         text.set_text(
+            "ram:    %.2fmb\n"
             "calc:   %.0fus\n"
             "buffer: %.0fus\n"
-            "render: %.0fus\n"
+            "render: %.2fms\n"
             "all:    %.2fms\n"
             "fps:    %.0f",
-            c, b, r, a / 1000.f, 1.f / d
+            ram / (1024.f * 1024.f), c, b, r / 1000.f, a / 1000.f, 1.f / d
         );
     }
 
@@ -66,9 +69,10 @@ struct DebugUI {
             tr /= static_cast<double>(DBUISZ);
             ta /= static_cast<double>(DBUISZ);
             td /= static_cast<double>(DBUISZ);
-            set_text(tc, tb, tr, ta, td);
+            size_t ram = nallocs * sizeof(Chunk);
+            set_text(ram, tc, tb, tr, ta, td);
         }
-        text.render(10, 45, 5);
+        text.render(10, 45, 2 * window.frame_to_window);
     }
 
 };

@@ -22,8 +22,8 @@ void Minecraft::user_create() {
     wrenderer.init();
 
     camera.enable_look();
-    camera.getPos() = vec3{20.f, 16.f, 20.f};
-    camera.getFar() = 300.f;
+    camera.getPos() = vec3{14.f, 16.f, 14.f};
+    camera.getFar() = 700.f;
     camera.getNear() = 0.01f;
     camera.update();
 }
@@ -39,8 +39,11 @@ void Minecraft::user_update(float dt, Keyboard const& kb, Mouse const& mouse) {
     vec3 fwd = camera.readLook(); fwd.y = 0;
     vec3 rht = cross(camera.readLook(), camera.readUp());
     float speed = 4.;
-    if (window.keyboard[GLFW_KEY_TAB].down) {
-        speed *= 3.;
+    if (window.keyboard[GLFW_KEY_PERIOD].down) {
+        speed *= 5.;
+    }
+    if (window.keyboard[GLFW_KEY_COMMA].down) {
+        speed *= 5.;
     }
     if (window.keyboard[GLFW_KEY_W].down) {
         move += fwd;
@@ -64,6 +67,11 @@ void Minecraft::user_update(float dt, Keyboard const& kb, Mouse const& mouse) {
     }
 
     camera.getPos() += move;
+
+    cpos_t cpos = pos_to_cpos(camera.readPos());
+    if (cpos != world.center()) {
+        world.shift_to(cpos);
+    }
     
     camera.update();
 }
