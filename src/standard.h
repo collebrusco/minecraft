@@ -17,7 +17,7 @@ typedef size_t blockID;
 #define CHUNK_SIZE_F (static_cast<float>(CHUNK_SIZE))
 #define MAX_HEIGHT (256)
 #define MAX_HEIGHT_F (static_cast<float>(MAX_HEIGHT))
-#define RENDER_DISTANCE_R (16)
+#define RENDER_DISTANCE_R (8)
 #define RENDER_DISTANCE_MIDPT RENDER_DISTANCE_R
 #define RENDER_DISTANCE (RENDER_DISTANCE_R * 2)
 #define RENDER_DISTANCE_F (static_cast<float>(RENDER_DISTANCE))
@@ -35,6 +35,16 @@ cpos_t pos_to_cpos(pos_t const& pos);
 pos_t cpos_to_pos(cpos_t const& cpos, pos_t const& offset = pos_t{0.,0.,0.});
 
 bool bpos_local(bpos_t const& bpos);
+
+typedef enum {
+    TOP     = 0,
+    BOT     = 1,
+    NORTH   = 2,
+    SOUTH   = 3,
+    EAST    = 4,
+    WEST    = 5
+} orientation_e;
+#define ORIENTATION_LAST (WEST)
 
 #define V3_UP      (glm::vec3{ 0.f, 1.f, 0.f})
 #define V3_DOWN    (glm::vec3{ 0.f,-1.f, 0.f})

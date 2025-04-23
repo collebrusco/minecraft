@@ -26,16 +26,13 @@ Block::Block(BlockType const *const typ) : type(typ) {
 }
 
 Chunk::Chunk(cpos_t p) : pos(p), model(genModelMat3d(cpos_to_pos(p), glm::vec3(0.f), glm::vec3(1.))), flag(true), store() {
-    
 }
 
 Block *Chunk::blockAt(bpos_t local) {
-    Block* b = this->store.get(local);
-    return b;
+    return this->store.get(local);
 }
 
 Block const *Chunk::blockAt(bpos_t local) const {
-    Block const* b = this->store.read(local);
-    return b;
+    return this->store.read(local);
 }
 

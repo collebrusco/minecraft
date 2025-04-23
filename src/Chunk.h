@@ -7,17 +7,7 @@
 #define CHUNK_H
 #include "standard.h"
 #include <flgl/ecs.h>
-
-struct BlockType {
-    blockID id;
-};
-
-struct Blocks {
-    inline static blockID newID() {return idct++;}
-    static const BlockType stone;
-private:
-    static blockID idct;
-};
+#include "Blocks.h"
 
 struct Block {
     BlockType const* type;
