@@ -27,6 +27,6 @@ void main(){
     vec2 UV = iUV; UV.y = 1. - UV.y;
     vec4 base = texture(uTex, texi_to_botleft(texi) + (UV * FACE_SIZE_UV));
     vec4 kd = base * max(0.,dot(-uLightdir, iNorm));
-    vec4 ka = base * 0.25;
+    vec4 ka = base * 0.22;
     outColor = ka + kd;
 }

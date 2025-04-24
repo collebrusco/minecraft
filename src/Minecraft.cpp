@@ -1,5 +1,6 @@
 #include "Minecraft.h"
 #include <flgl/logger.h>
+#include "OutlineRenderer.h"
 using namespace glm;
 LOG_MODULE(mc);
 
@@ -19,6 +20,8 @@ void Minecraft::user_create() {
     dbui.init();
 
     wrenderer.init();
+
+    OutlineRenderer::init();
 
     camera.enable_look();
     camera.getPos() = vec3{14.f, 16.f, 14.f};
@@ -56,7 +59,9 @@ void Minecraft::user_update(float dt, Keyboard const& kb, Mouse const& mouse) {
     if (window.keyboard[GLFW_KEY_D].down) {
         move += rht;
     }
-    if (length(move) > 0.) move = normalize(move);
+    if (length(move) > 0.) {
+        move = normalize(move);
+    }
     move *= speed * dt;
     if (window.keyboard[GLFW_KEY_SPACE].down) {
         move += (V3_UP * speed * dt);
@@ -93,6 +98,9 @@ void Minecraft::user_render() {
     wrenderer.render();
         glFinish();
         dbui.tren.stop();
+
+    OutlineRenderer::sync(camera);
+    OutlineRenderer::draw({14,14,14});
 
         dbui.tall.stop();
         dbui.tick(dt());

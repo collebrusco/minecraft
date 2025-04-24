@@ -16,6 +16,13 @@ void BasicWorldGen::gen_chunk(cpos_t cpos, Chunk *target) const {
     }
 }
 
+void OtherWorldGen::gen_chunk(cpos_t pos, Chunk *target) const {
+
+}
+
+void OtherWorldGen::add_frequency(int octave, float mag) {
+}
+
 World::ChunkStore::~ChunkStore() {
     for (auto pair : map) {
         nallocs--;
