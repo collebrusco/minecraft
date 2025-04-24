@@ -11,7 +11,7 @@ void BasicWorldGen::gen_chunk(cpos_t cpos, Chunk *target) const {
         for (int j = 0; j < CHUNK_SIZE; j++) {
             int x = pos.x + i; int z = pos.z + j;
             int y = glm::floor(RNG::random_scalar_octave(x, z, 6) * 6.);
-            target->blockAt(bpos_t{i, y, j})->type = &Blocks::stone;
+            target->blockAt(bpos_t{i, y, j})->type = &Blocks::grass;
         }
     }
 }

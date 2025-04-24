@@ -12,6 +12,7 @@ uniform mat4 uProj;
 out vec2 iUV;
 out vec3 iPos;
 out vec3 iNorm;
+flat out uint texi;
 
 #define V3_UP      (vec3( 0.f, 1.f, 0.f))
 #define V3_DOWN    (vec3( 0.f,-1.f, 0.f))
@@ -71,6 +72,8 @@ void main() {
     instance.x = float(aInstance & 0xFu);
     instance.z = float((aInstance >> 4) & 0xFu);
     instance.y = float((aInstance >> 8) & 0xFFu);
+    instance.tex = ((aInstance >> (8+4+4+3)) & 0x1FFFu);
+    texi = instance.tex;
 
     vec3 rPos = rotate_by_orient(aPos, instance.orientation) + vec3(instance.x, instance.y, instance.z);
     vec3 rNorm = normal_from_orient(instance.orientation);

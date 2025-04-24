@@ -1,7 +1,5 @@
 #include "standard.h"
 
-
-
 /** convert block position to absolute position. the position returned is the min corner of the block by default or offset by the offset parameter */
 pos_t bpos_to_pos(bpos_t const& bp, pos_t const& offset) {
     return ((pos_t)bp) + offset;
@@ -41,6 +39,7 @@ pos_t cpos_to_pos(cpos_t const& cpos, pos_t const& offset) {
     return bpos_to_pos(cpos_to_bpos(cpos)) + offset;
 }
 
+/** checks if the given block position is a valid local chunk coord */
 bool bpos_local(bpos_t const &bpos) {
     return (bpos.x >= 0) && (bpos.y >= 0) && (bpos.z >= 0) &&
            (bpos.x < CHUNK_SIZE) && (bpos.z < CHUNK_SIZE) && bpos.y < MAX_HEIGHT;

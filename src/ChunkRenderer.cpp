@@ -6,6 +6,7 @@ VertexArray ChunkRenderer::vao;
 VertexBuffer<Vt_pun> ChunkRenderer::vbo;
 ElementBuffer ChunkRenderer::ibo;
 Shader ChunkRenderer::shader;
+Texture ChunkRenderer::texture;
 
 #define HEIGHT_BITS (8)
 #define X_BITS      (4)
@@ -33,6 +34,9 @@ union instance_u {
 void ChunkRenderer::init_chunk_rendering() {
 
     shader = Shader::from_source("chunk_vert", "chunk_frag");
+
+    texture = Texture::from_file("spritesheet");
+    texture.pixelate();
 
     const Vt_pun verts[] = {
         {{-QUAD,-QUAD,-QUAD}, {0.,0.}, {0.,0.,-1.}},
@@ -64,6 +68,7 @@ void ChunkRenderer::destroy_chunk_rendering() {
     vbo.destroy();
     ibo.destroy();
     shader.destroy();
+    texture.destroy();
 }
 
 void ChunkRenderer::init() {
@@ -94,37 +99,37 @@ bool ChunkRenderer::update(Chunk const &chunk) {
                     near += V3_UP;
                     Block const* test = chunk.blockAt(near);
                     if (!bpos_local(near) || test->empty()) {
-                        emit_face(TOP, local.x, local.y, local.z);
+                        emit_face(TOP, b->type->faces[TOP].face, local.x, local.y, local.z);
                     }
                     near = local;
                     near += V3_DOWN;
                     test = chunk.blockAt(near);
                     if (!bpos_local(near) || test->empty()) {
-                        emit_face(BOT, local.x, local.y, local.z);
+                        emit_face(BOT, b->type->faces[BOT].face, local.x, local.y, local.z);
                     }
                     near = local;
                     near += V3_EAST;
                     test = chunk.blockAt(near);
                     if (!bpos_local(near) || test->empty()) {
-                        emit_face(EAST, local.x, local.y, local.z);
+                        emit_face(EAST, b->type->faces[EAST].face, local.x, local.y, local.z);
                     }
                     near = local;
                     near += V3_WEST;
                     test = chunk.blockAt(near);
                     if (!bpos_local(near) || test->empty()) {
-                        emit_face(WEST, local.x, local.y, local.z);
+                        emit_face(WEST, b->type->faces[WEST].face, local.x, local.y, local.z);
                     }
                     near = local;
                     near += V3_NORTH;
                     test = chunk.blockAt(near);
                     if (!bpos_local(near) || test->empty()) {
-                        emit_face(NORTH, local.x, local.y, local.z);
+                        emit_face(NORTH, b->type->faces[NORTH].face, local.x, local.y, local.z);
                     }
                     near = local;
                     near += V3_SOUTH;
                     test = chunk.blockAt(near);
                     if (!bpos_local(near) || test->empty()) {
-                        emit_face(SOUTH, local.x, local.y, local.z);
+                        emit_face(SOUTH, b->type->faces[SOUTH].face, local.x, local.y, local.z);
                     }
                 }
             }
@@ -140,7 +145,7 @@ void ChunkRenderer::buffer() {
 }
 void ChunkRenderer::sync(Camera const &cam) {
     shader.uViewProj(cam.view(), cam.proj());
-    shader.uVec3("uLightdir", glm::normalize(vec3{-1., -8., -2.}));
+    shader.uVec3("uLightdir", glm::normalize(vec3{-1., -8., -2.})); /* TODO get from world */
 }
 
 void ChunkRenderer::render() const {
@@ -150,6 +155,7 @@ void ChunkRenderer::render() const {
     gl.enable_depth_test();
     vao.bind();
     shader.bind();
+    texture.bind();
     gl.draw_vao_ibo_instanced(ibo, instance_data.size());
 }
 
@@ -163,7 +169,13 @@ void ChunkRenderer::emit_cube(int sx, int sy, int sz) {
     instance_data.push_back((instance_u){.f.x = x, .f.height = y, .f.y = z, .f.orientation = WEST}.val);
 }
 
-void ChunkRenderer::emit_face(orientation_e o, int sx, int sy, int sz) {
+void ChunkRenderer::emit_face(orientation_e o, face_e face, int sx, int sy, int sz) {
     uint32_t x = sx; uint32_t y = sy; uint32_t z = sz;
-    instance_data.push_back((instance_u){.f.x = x, .f.height = y, .f.y = z, .f.orientation = o}.val);
+    instance_data.push_back((instance_u){
+        .f.x = x,
+        .f.y = z,
+        .f.height = y,
+        .f.orientation = o,
+        .f.tex = face
+    }.val);
 }

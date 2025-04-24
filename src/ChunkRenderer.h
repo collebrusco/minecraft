@@ -8,6 +8,7 @@
 #include <vector>
 #include <flgl.h>
 #include "Chunk.h"
+#include "Blocks.h"
 
 struct ChunkRenderer {
 
@@ -15,6 +16,7 @@ struct ChunkRenderer {
     static VertexBuffer<Vt_pun> vbo;
     static ElementBuffer ibo;
     static Shader shader;
+    static Texture texture;
 
     glm::mat4 model;
     std::vector<uint32_t> instance_data;
@@ -34,7 +36,7 @@ struct ChunkRenderer {
     void render() const;
 
     void emit_cube(int x, int y, int z);
-    void emit_face(orientation_e o, int x, int y, int z);
+    void emit_face(orientation_e o, face_e face, int x, int y, int z);
 };
 
 
