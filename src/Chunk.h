@@ -13,6 +13,13 @@ struct Block {
     BlockType const* type;
     Block(BlockType const*const type = 0);
     inline bool empty() const {return !type;}
+    static inline Block null() {return {0};}
+};
+
+struct LocatedBlock {
+    bpos_t pos;
+    Block* block;
+    static inline LocatedBlock null() {return {{0,0,0},0};}
 };
 
 struct Chunk {

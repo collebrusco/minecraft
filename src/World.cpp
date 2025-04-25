@@ -16,12 +16,6 @@ void BasicWorldGen::gen_chunk(cpos_t cpos, Chunk *target) const {
     }
 }
 
-void OtherWorldGen::gen_chunk(cpos_t pos, Chunk *target) const {
-
-}
-
-void OtherWorldGen::add_frequency(int octave, float mag) {
-}
 
 World::ChunkStore::~ChunkStore() {
     for (auto pair : map) {
@@ -36,6 +30,10 @@ Chunk *World::ChunkStore::get(cpos_t pos) {
     map_it_t it = map.find(pos);
     if (it == map.end()) return 0;
     return it->second;
+}
+
+Chunk const *World::ChunkStore::get(cpos_t pos) const {
+    return this->get(pos);
 }
 
 Chunk *World::ChunkStore::gen(cpos_t pos, WorldGenerator const &gen) {
@@ -70,24 +68,82 @@ World::~World() {
 }
 
 Chunk *World::chunkAt(cpos_t pos) {
-    LOG_ERR("UNIMPLEMENTED");
-    return nullptr;
+    return store.get(pos);
 }
 
 Chunk const *World::chunkAt(cpos_t pos) const {
-    LOG_ERR("UNIMPLEMENTED");
-    return nullptr;
+    return store.get(pos);
 }
 
 Block *World::blockAt(bpos_t pos) {
-    LOG_ERR("UNIMPLEMENTED");
-    return nullptr;
+    return this->chunkAt(bpos_to_cpos(pos))->blockAt(bpos_to_local(pos));
 }
 
 Block const *World::blockAt(bpos_t pos) const {
-    LOG_ERR("UNIMPLEMENTED");
-    return nullptr;
+    return this->blockAt(pos);
 }
+
+RaycastResult World::raycast(Ray const& r, float maxlen) {
+    const glm::vec3 origin = r.pos;
+    const glm::vec3 dir = glm::normalize(r.dir);
+
+    bpos_t blockPos = glm::floor(origin);
+
+    glm::ivec3 step(
+        dir.x > 0 ? 1 : (dir.x < 0 ? -1 : 0),
+        dir.y > 0 ? 1 : (dir.y < 0 ? -1 : 0),
+        dir.z > 0 ? 1 : (dir.z < 0 ? -1 : 0)
+    );
+
+    glm::vec3 tMax(
+        (step.x != 0) ? ((glm::floor(origin.x) + (step.x > 0 ? 1.0f : 0.0f)) - origin.x) / dir.x : FLT_MAX,
+        (step.y != 0) ? ((glm::floor(origin.y) + (step.y > 0 ? 1.0f : 0.0f)) - origin.y) / dir.y : FLT_MAX,
+        (step.z != 0) ? ((glm::floor(origin.z) + (step.z > 0 ? 1.0f : 0.0f)) - origin.z) / dir.z : FLT_MAX
+    );
+
+    glm::vec3 tDelta(
+        (step.x != 0) ? 1.0f / glm::abs(dir.x) : FLT_MAX,
+        (step.y != 0) ? 1.0f / glm::abs(dir.y) : FLT_MAX,
+        (step.z != 0) ? 1.0f / glm::abs(dir.z) : FLT_MAX
+    );
+
+    float dist_traveled = 0.0f;
+
+    while (dist_traveled <= maxlen) {
+        Block* block = blockAt(blockPos);
+        if (block && !block->empty()) {
+            // Exact collision point: origin + dir * dist_traveled
+            glm::vec3 collision_pos = origin + dir * dist_traveled;
+            return {blockPos, block, collision_pos, dist_traveled};
+        }
+
+        if (tMax.x < tMax.y) {
+            if (tMax.x < tMax.z) {
+                blockPos.x += step.x;
+                dist_traveled = tMax.x;
+                tMax.x += tDelta.x;
+            } else {
+                blockPos.z += step.z;
+                dist_traveled = tMax.z;
+                tMax.z += tDelta.z;
+            }
+        } else {
+            if (tMax.y < tMax.z) {
+                blockPos.y += step.y;
+                dist_traveled = tMax.y;
+                tMax.y += tDelta.y;
+            } else {
+                blockPos.z += step.z;
+                dist_traveled = tMax.z;
+                tMax.z += tDelta.z;
+            }
+        }
+    }
+
+    // If no block hit, return miss
+    return {blockPos, 0, origin + dir * maxlen, maxlen};
+}
+
 
 void World::shift(int dx, int dy) {
     if (dx > 1 || dx < -1 || dy > 1 || dy < -1) {

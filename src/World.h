@@ -36,16 +36,26 @@ namespace std {
     };
 }
 
+struct RaycastResult {
+    bpos_t bpos;
+    Block* block;
+    pos_t pos;
+    float len;
+    inline bool miss() const {return !block;}
+    inline bool hit() const {return block;}
+};
+
 struct World : public ECS<> {
     World(WorldGenerator&);
     ~World();
+    NO_COPY_OR_MOVE(World);
 
     Chunk* chunkAt(cpos_t pos);
     Chunk const* chunkAt(cpos_t pos) const;
     Block* blockAt(bpos_t pos);
     Block const* blockAt(bpos_t pos) const;
 
-    // Block* raycast()
+    RaycastResult raycast(Ray const& r, float maxlen = 5.f);
 
     inline cpos_t center() const {return _center;}
     void shift(int dx, int dy);
@@ -61,6 +71,7 @@ private:
         typedef std::unordered_map<cpos_t, Chunk*>::iterator map_it_t;
         std::unordered_map<cpos_t, Chunk*> map;
         Chunk* get(cpos_t);
+        Chunk const* get(cpos_t) const;
         Chunk* gen(cpos_t, WorldGenerator const& gen);
         Chunk* get_or_gen(cpos_t, WorldGenerator const& gen);
     };

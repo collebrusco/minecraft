@@ -5,7 +5,7 @@ VertexArray OutlineRenderer::vao;
 VertexBuffer<glm::vec3> OutlineRenderer::vbo;
 ElementBuffer OutlineRenderer::ibo;
 
-#define QUAD (0.5f)
+#define QUAD (0.501f)
 
 void OutlineRenderer::init() {
 

@@ -48,6 +48,8 @@ vec3 rotate_by_orient(vec3 v, uint o) {
     res = mix(res, vec3(-v.z,  v.y,  v.x), float(o == EAST));
     res = mix(res, vec3( v.z,  v.y, -v.x), float(o == WEST));
 
+    res = res + vec3(0.5,0.5,0.5);
+
     return res;
 }
 

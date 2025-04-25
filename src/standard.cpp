@@ -40,7 +40,11 @@ pos_t cpos_to_pos(cpos_t const& cpos, pos_t const& offset) {
 }
 
 /** checks if the given block position is a valid local chunk coord */
-bool bpos_local(bpos_t const &bpos) {
+bool bpos_is_local(bpos_t const &bpos) {
     return (bpos.x >= 0) && (bpos.y >= 0) && (bpos.z >= 0) &&
            (bpos.x < CHUNK_SIZE) && (bpos.z < CHUNK_SIZE) && bpos.y < MAX_HEIGHT;
+}
+
+bpos_t bpos_to_local(bpos_t const &global) {
+    return {index_mod(global.x, CHUNK_SIZE), index_mod(global.y, MAX_HEIGHT), index_mod(global.z, CHUNK_SIZE)};
 }

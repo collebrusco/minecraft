@@ -1,6 +1,7 @@
 #include "Minecraft.h"
 #include <flgl/logger.h>
 #include "OutlineRenderer.h"
+#include "BasicRenderer.h"
 using namespace glm;
 LOG_MODULE(mc);
 
@@ -22,6 +23,10 @@ void Minecraft::user_create() {
     wrenderer.init();
 
     OutlineRenderer::init();
+
+    PointRenderer::init();
+
+    WorldPointRenderer::init();
 
     camera.enable_look();
     camera.getPos() = vec3{14.f, 16.f, 14.f};
@@ -76,12 +81,14 @@ void Minecraft::user_update(float dt, Keyboard const& kb, Mouse const& mouse) {
     if (cpos != world.center()) {
         world.shift_to(cpos);
     }
+
+    cast = world.raycast(Ray(camera.readPos(), camera.readLook()));
     
     camera.update();
 }
 
 void Minecraft::user_render() {
-    gl.set_clear_color(0.23, 0.01, 0.33);
+    gl.set_clear_color(135./255., 206./255., 235./255.);
     gl.clear();
 
         dbui.tcpu.start();
@@ -99,8 +106,15 @@ void Minecraft::user_render() {
         glFinish();
         dbui.tren.stop();
 
-    OutlineRenderer::sync(camera);
-    OutlineRenderer::draw({14,14,14});
+
+    if (cast.hit()) {
+        OutlineRenderer::sync(camera);
+        OutlineRenderer::draw(cast.bpos);
+        WorldPointRenderer::sync(camera);
+        WorldPointRenderer::render(cast.bpos);
+    }
+
+    PointRenderer::render();
 
         dbui.tall.stop();
         dbui.tick(dt());
@@ -111,5 +125,7 @@ void Minecraft::user_destroy() {
     dbui.destroy();
     TextRenderer::destroy_text_rendering();
     ChunkRenderer::destroy_chunk_rendering();
+    PointRenderer::destroy();
+    WorldPointRenderer::destroy();
     wrenderer.destroy();
 }

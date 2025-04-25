@@ -8,6 +8,7 @@
 #include <flgl/glm.h>
 #include <flgl/logger.h>
 #include <flgl/tools.h>
+#include <flgl/geometry.h>
 
 typedef size_t blockID;
 
@@ -34,7 +35,8 @@ bpos_t cpos_to_bpos(cpos_t const& cpos, bpos_t const& offset = bpos_t{0,0,0});
 cpos_t pos_to_cpos(pos_t const& pos);
 pos_t cpos_to_pos(cpos_t const& cpos, pos_t const& offset = pos_t{0.,0.,0.});
 
-bool bpos_local(bpos_t const& bpos);
+bool bpos_is_local(bpos_t const& bpos);
+bpos_t bpos_to_local(bpos_t const& global);
 
 typedef enum {
     TOP     = 0,

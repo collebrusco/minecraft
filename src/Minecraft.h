@@ -28,6 +28,8 @@ struct Minecraft : public Driver {
     World world;
     WorldRenderer wrenderer;
 
+    RaycastResult cast;
+
     DebugUI dbui;
 
 };

@@ -98,37 +98,37 @@ bool ChunkRenderer::update(Chunk const &chunk) {
                     bpos_t near = local;
                     near += V3_UP;
                     Block const* test = chunk.blockAt(near);
-                    if (!bpos_local(near) || test->empty()) {
+                    if (!bpos_is_local(near) || test->empty()) {
                         emit_face(TOP, b->type->faces[TOP].face, local.x, local.y, local.z);
                     }
                     near = local;
                     near += V3_DOWN;
                     test = chunk.blockAt(near);
-                    if (!bpos_local(near) || test->empty()) {
+                    if (!bpos_is_local(near) || test->empty()) {
                         emit_face(BOT, b->type->faces[BOT].face, local.x, local.y, local.z);
                     }
                     near = local;
                     near += V3_EAST;
                     test = chunk.blockAt(near);
-                    if (!bpos_local(near) || test->empty()) {
+                    if (!bpos_is_local(near) || test->empty()) {
                         emit_face(EAST, b->type->faces[EAST].face, local.x, local.y, local.z);
                     }
                     near = local;
                     near += V3_WEST;
                     test = chunk.blockAt(near);
-                    if (!bpos_local(near) || test->empty()) {
+                    if (!bpos_is_local(near) || test->empty()) {
                         emit_face(WEST, b->type->faces[WEST].face, local.x, local.y, local.z);
                     }
                     near = local;
                     near += V3_NORTH;
                     test = chunk.blockAt(near);
-                    if (!bpos_local(near) || test->empty()) {
+                    if (!bpos_is_local(near) || test->empty()) {
                         emit_face(NORTH, b->type->faces[NORTH].face, local.x, local.y, local.z);
                     }
                     near = local;
                     near += V3_SOUTH;
                     test = chunk.blockAt(near);
-                    if (!bpos_local(near) || test->empty()) {
+                    if (!bpos_is_local(near) || test->empty()) {
                         emit_face(SOUTH, b->type->faces[SOUTH].face, local.x, local.y, local.z);
                     }
                 }
