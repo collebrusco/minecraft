@@ -25,16 +25,6 @@ struct BasicWorldGen : public WorldGenerator {
     virtual void gen_chunk(cpos_t, Chunk* target) const override final;
 };
 
-struct OtherWorldGen : public WorldGenerator {
-    virtual void gen_chunk(cpos_t pos, Chunk* target) const override final;
-    void add_frequency(int octave, float mag);
-private:
-    struct Frequency {
-        int octave; float mag;
-    };
-    std::vector<Frequency> spectrum;
-};
-
 namespace std {
     template<>
     struct hash<cpos_t> {
