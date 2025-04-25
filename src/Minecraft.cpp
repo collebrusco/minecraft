@@ -1,6 +1,7 @@
 #include "Minecraft.h"
 #include <flgl/logger.h>
 #include "OutlineRenderer.h"
+#include "EntityRenderer.h"
 using namespace glm;
 LOG_MODULE(mc);
 
@@ -22,6 +23,7 @@ void Minecraft::user_create() {
     wrenderer.init();
 
     OutlineRenderer::init();
+    EntityRenderer::init();
 
     camera.enable_look();
     camera.getPos() = vec3{14.f, 16.f, 14.f};
@@ -104,6 +106,7 @@ void Minecraft::user_render() {
 
         dbui.tall.stop();
         dbui.tick(dt());
+    EntityRenderer::render();
 
 }
 
@@ -111,5 +114,7 @@ void Minecraft::user_destroy() {
     dbui.destroy();
     TextRenderer::destroy_text_rendering();
     ChunkRenderer::destroy_chunk_rendering();
+    OutlineRenderer::destroy();
+    EntityRenderer::destroy();
     wrenderer.destroy();
 }
