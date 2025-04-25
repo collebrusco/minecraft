@@ -110,8 +110,8 @@ void Minecraft::user_render() {
     if (cast.hit()) {
         OutlineRenderer::sync(camera);
         OutlineRenderer::draw(cast.bpos);
-        WorldPointRenderer::sync(camera);
-        WorldPointRenderer::render(cast.bpos);
+        // WorldPointRenderer::sync(camera);
+        // WorldPointRenderer::render(cast.pos);
     }
 
     PointRenderer::render();
