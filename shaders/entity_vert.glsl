@@ -6,8 +6,10 @@ layout (location = 2) in vec3 aNorm;
 uniform mat4 uModel;
 uniform mat4 uView;
 uniform mat4 uProj;
-
+uniform mat4 uModelPart;
+out vec3 iNorm;
 void main() {
-    gl_Position = uProj * uView * uModel * vec4(aPos, 1.0f); 
+    iNorm = aNorm;
+    gl_Position = uProj * uView * uModel * uModelPart * vec4(aPos, 1.0f); 
     //gl_Position = vec4(aPos, 1.0f);
 }

@@ -107,7 +107,7 @@ void Minecraft::user_render() {
         dbui.tall.stop();
         dbui.tick(dt());
     EntityRenderer::sync(camera);
-    EntityRenderer::render({14,14,20});
+    EntityRenderer::render(launch_timer(), {14,14,20});
 
 }
 
