@@ -37,9 +37,10 @@ namespace std {
 }
 
 struct RaycastResult {
-    bpos_t bpos;
     Block* block;
+    bpos_t bpos;
     pos_t pos;
+    orientation_e face;
     float len;
     inline bool miss() const {return !block;}
     inline bool hit() const {return block;}

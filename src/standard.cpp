@@ -1,5 +1,23 @@
 #include "standard.h"
 
+const glm::vec3 DIRECTIONS[] = {
+    (glm::vec3{ 0.f, 1.f, 0.f}),
+    (glm::vec3{ 0.f,-1.f, 0.f}),
+    (glm::vec3{ 0.f, 0.f, 1.f}),
+    (glm::vec3{ 0.f, 0.f,-1.f}),
+    (glm::vec3{ 1.f, 0.f, 0.f}),
+    (glm::vec3{-1.f, 0.f, 0.f})
+};
+
+const glm::ivec3 IDIRECTIONS[] = {
+    (glm::ivec3{ 0, 1, 0}),
+    (glm::ivec3{ 0,-1, 0}),
+    (glm::ivec3{ 0, 0, 1}),
+    (glm::ivec3{ 0, 0,-1}),
+    (glm::ivec3{ 1, 0, 0}),
+    (glm::ivec3{-1, 0, 0})
+};
+
 /** convert block position to absolute position. the position returned is the min corner of the block by default or offset by the offset parameter */
 pos_t bpos_to_pos(bpos_t const& bp, pos_t const& offset) {
     return ((pos_t)bp) + offset;

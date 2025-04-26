@@ -48,12 +48,15 @@ typedef enum {
 } orientation_e;
 #define ORIENTATION_LAST (WEST)
 
-#define V3_UP      (glm::vec3{ 0.f, 1.f, 0.f})
-#define V3_DOWN    (glm::vec3{ 0.f,-1.f, 0.f})
-#define V3_NORTH   (glm::vec3{ 0.f, 0.f, 1.f})
-#define V3_SOUTH   (glm::vec3{ 0.f, 0.f,-1.f})
-#define V3_EAST    (glm::vec3{ 1.f, 0.f, 0.f})
-#define V3_WEST    (glm::vec3{-1.f, 0.f, 0.f})
+extern const glm::vec3 DIRECTIONS[6];
+extern const glm::ivec3 IDIRECTIONS[6];
+
+#define V3_UP      (DIRECTIONS[TOP])
+#define V3_DOWN    (DIRECTIONS[BOT])
+#define V3_NORTH   (DIRECTIONS[NORTH])
+#define V3_SOUTH   (DIRECTIONS[SOUTH])
+#define V3_EAST    (DIRECTIONS[EAST])
+#define V3_WEST    (DIRECTIONS[WEST])
 
 #define V2_NORTH   (glm::vec2{ 0.f,  1.f})
 #define V2_SOUTH   (glm::vec2{ 0.f, -1.f})

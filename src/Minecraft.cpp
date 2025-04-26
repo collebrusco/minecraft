@@ -64,6 +64,11 @@ void Minecraft::user_update(float dt, Keyboard const& kb, Mouse const& mouse) {
     if (window.keyboard[GLFW_KEY_D].down) {
         move += rht;
     }
+    if (window.keyboard[GLFW_KEY_L].pressed) {
+        static bool mg = true;
+        mg = !mg;
+        window.set_mouse_grab(mg);
+    }
     if (length(move) > 0.) {
         move = normalize(move);
     }
@@ -83,6 +88,15 @@ void Minecraft::user_update(float dt, Keyboard const& kb, Mouse const& mouse) {
     }
 
     cast = world.raycast(Ray(camera.readPos(), camera.readLook()));
+
+    if (mouse.left().pressed && cast.hit()) {
+        *(cast.block) = Block::null();
+    }
+
+    if (mouse.right().pressed && cast.hit()) {
+        Block* place = world.blockAt(cast.bpos + IDIRECTIONS[cast.face]);
+        place->type = &Blocks::stone;
+    }
     
     camera.update();
 }
@@ -110,8 +124,6 @@ void Minecraft::user_render() {
     if (cast.hit()) {
         OutlineRenderer::sync(camera);
         OutlineRenderer::draw(cast.bpos);
-        // WorldPointRenderer::sync(camera);
-        // WorldPointRenderer::render(cast.pos);
     }
 
     PointRenderer::render();
