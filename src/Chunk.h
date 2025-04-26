@@ -16,12 +16,6 @@ struct Block {
     static inline Block null() {return {0};}
 };
 
-struct LocatedBlock {
-    bpos_t pos;
-    Block* block;
-    static inline LocatedBlock null() {return {{0,0,0},0};}
-};
-
 struct Chunk {
     Chunk(cpos_t pos);
     cpos_t pos;
@@ -34,6 +28,7 @@ private:
     const glm::mat4 model;
     bool flag;
     struct BlockStore {
+        friend struct Chunk;
         BlockStore();
         Block* get(bpos_t local);
         Block const* read(bpos_t local) const;

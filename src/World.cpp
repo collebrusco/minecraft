@@ -32,9 +32,12 @@ Chunk *World::ChunkStore::get(cpos_t pos) {
     return it->second;
 }
 
-Chunk const *World::ChunkStore::get(cpos_t pos) const {
-    return this->get(pos);
+Chunk const* World::ChunkStore::get(cpos_t pos) const {
+    cmap_it_t it = map.find(pos);
+    if (it == map.end()) return nullptr;
+    return it->second;
 }
+
 
 Chunk *World::ChunkStore::gen(cpos_t pos, WorldGenerator const &gen) {
     map_it_t it = map.find(pos);
@@ -73,7 +76,7 @@ Chunk *World::chunkAt(cpos_t pos) {
     return chunk;
 }
 
-Chunk const *World::chunkAt(cpos_t pos) const {
+Chunk const *World::read_chunkAt(cpos_t pos) const {
     return store.get(pos);
 }
 
@@ -83,8 +86,9 @@ Block *World::blockAt(bpos_t pos) {
     return chunk->blockAt(bpos_to_local(pos));
 }
 
-Block const *World::blockAt(bpos_t pos) const {
-    return this->blockAt(pos);
+Block const *World::read_blockAt(bpos_t pos) const {
+    const Chunk* chunk = this->read_chunkAt(bpos_to_cpos(pos));
+    return chunk->blockAt(bpos_to_local(pos));
 }
 
 RaycastResult World::raycast(Ray const& r, float maxlen) {
@@ -112,44 +116,43 @@ RaycastResult World::raycast(Ray const& r, float maxlen) {
     );
 
     float dist_traveled = 0.0f;
-    orientation_e hit_face = TOP; // default init, will be overwritten on hit
+    orientation_e hit_face = TOP;
 
     while (dist_traveled <= maxlen) {
-        Block* block = blockAt(blockPos);
+        const Block* block = read_blockAt(blockPos);
         if (block && !block->empty()) {
             glm::vec3 collision_pos = origin + dir * dist_traveled;
             return {block, blockPos, collision_pos, hit_face, dist_traveled};
         }
 
-        // Advance to next voxel
         if (tMax.x < tMax.y) {
             if (tMax.x < tMax.z) {
                 blockPos.x += step.x;
-                hit_face = (step.x > 0) ? WEST : EAST; // entering WEST face if going +x, EAST if -x
+                hit_face = (step.x > 0) ? WEST : EAST;
                 dist_traveled = tMax.x;
                 tMax.x += tDelta.x;
             } else {
                 blockPos.z += step.z;
-                hit_face = (step.z > 0) ? SOUTH : NORTH; // entering SOUTH face if +z, NORTH if -z
+                hit_face = (step.z > 0) ? SOUTH : NORTH;
                 dist_traveled = tMax.z;
                 tMax.z += tDelta.z;
             }
         } else {
             if (tMax.y < tMax.z) {
                 blockPos.y += step.y;
-                hit_face = (step.y > 0) ? BOT : TOP; // entering BOT face if +y, TOP if -y
+                hit_face = (step.y > 0) ? BOT : TOP;
                 dist_traveled = tMax.y;
                 tMax.y += tDelta.y;
             } else {
                 blockPos.z += step.z;
-                hit_face = (step.z > 0) ? SOUTH : NORTH; // entering SOUTH face if +z, NORTH if -z
+                hit_face = (step.z > 0) ? SOUTH : NORTH;
                 dist_traveled = tMax.z;
                 tMax.z += tDelta.z;
             }
         }
     }
 
-    return {nullptr, blockPos, origin + dir * maxlen, TOP, maxlen}; // TOP is placeholder for miss
+    return {nullptr, blockPos, origin + dir * maxlen, TOP, maxlen};
 }
 
 

@@ -90,7 +90,8 @@ void Minecraft::user_update(float dt, Keyboard const& kb, Mouse const& mouse) {
     cast = world.raycast(Ray(camera.readPos(), camera.readLook()));
 
     if (mouse.left().pressed && cast.hit()) {
-        *(cast.block) = Block::null();
+        Block* b = world.blockAt(cast.bpos);
+        *b = Block::null();
     }
 
     if (mouse.right().pressed && cast.hit()) {

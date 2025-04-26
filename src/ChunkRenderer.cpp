@@ -93,6 +93,7 @@ bool ChunkRenderer::update(Chunk const &chunk) {
         for (int z = 0; z < CHUNK_SIZE; z++) {
             for (int x = 0; x < CHUNK_SIZE; x++) {
                 const bpos_t local{x,y,z};
+                assert(bpos_is_local(local));
                 Block const* b = chunk.blockAt(local);
                 if (b && !b->empty()) {
                     bpos_t near = local;

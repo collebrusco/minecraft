@@ -37,7 +37,7 @@ namespace std {
 }
 
 struct RaycastResult {
-    Block* block;
+    const Block* block;
     bpos_t bpos;
     pos_t pos;
     orientation_e face;
@@ -52,9 +52,9 @@ struct World : public ECS<> {
     NO_COPY_OR_MOVE(World);
 
     Chunk* chunkAt(cpos_t pos);
-    Chunk const* chunkAt(cpos_t pos) const;
+    Chunk const* read_chunkAt(cpos_t pos) const;
     Block* blockAt(bpos_t pos);
-    Block const* blockAt(bpos_t pos) const;
+    Block const* read_blockAt(bpos_t pos) const;
 
     RaycastResult raycast(Ray const& r, float maxlen = 5.f);
 
@@ -70,6 +70,7 @@ private:
         ~ChunkStore();
         NO_COPY_OR_MOVE(ChunkStore);
         typedef std::unordered_map<cpos_t, Chunk*>::iterator map_it_t;
+        typedef std::unordered_map<cpos_t, Chunk*>::const_iterator cmap_it_t;
         std::unordered_map<cpos_t, Chunk*> map;
         Chunk* get(cpos_t);
         Chunk const* get(cpos_t) const;

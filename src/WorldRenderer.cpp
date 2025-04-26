@@ -1,4 +1,5 @@
 #include "WorldRenderer.h"
+LOG_MODULE(wrend);
 
 #define ITER_WORLD_BUF(iter) int iter = 0; iter < RENDER_DISTANCE * RENDER_DISTANCE; iter++
 #define ITER_WORLD_BUFXY(iter) int iter = 0; iter < RENDER_DISTANCE; iter++
