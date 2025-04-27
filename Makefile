@@ -25,3 +25,11 @@ ca:
 .PHONY: r
 r: default
 	./build/minecraft
+.PHONY: update
+update:
+	git submodule update --remote
+	mkdir -p build
+	cd build && \
+		cmake .. && \
+		make
+
