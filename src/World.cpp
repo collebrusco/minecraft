@@ -156,6 +156,56 @@ World::RaycastResult World::raycast(Ray const& r, float maxlen) {
 }
 
 
+static inline bool solid_block(const World* w, int x, int y, int z) {
+    const Block* b = w->read_blockAt({x, y, z});
+    return b && !b->empty();
+}
+
+bool World::disc_collide(pos_t pos, float rad) const {
+    const int bx = static_cast<int>(std::floor(pos.x));
+    const int bz = static_cast<int>(std::floor(pos.z));
+    const int by = static_cast<int>(std::floor(pos.y));
+
+    const float lx = pos.x - (bx + 0.5f);
+    const float lz = pos.z - (bz + 0.5f);
+
+    const float half = 0.5f;
+    const float rr   = rad * rad;
+
+    const bool center      = !read_blockAt({bx,     by, bz})->empty();
+
+    const bool west        = (lx < -(half - rad)) && !read_blockAt({bx - 1, by, bz})->empty();
+    const bool east        = (lx >  (half - rad)) && !read_blockAt({bx + 1, by, bz})->empty();
+    const bool north       = (lz >  (half - rad)) && !read_blockAt({bx,     by, bz + 1})->empty();
+    const bool south       = (lz < -(half - rad)) && !read_blockAt({bx,     by, bz - 1})->empty();
+
+    const bool north_west  = ( (lx + half)*(lx + half) + (lz - half)*(lz - half) < rr ) && !read_blockAt({bx - 1, by, bz + 1})->empty();
+    const bool north_east  = ( (lx - half)*(lx - half) + (lz - half)*(lz - half) < rr ) && !read_blockAt({bx + 1, by, bz + 1})->empty();
+    const bool south_west  = ( (lx + half)*(lx + half) + (lz + half)*(lz + half) < rr ) && !read_blockAt({bx - 1, by, bz - 1})->empty();
+    const bool south_east  = ( (lx - half)*(lx - half) + (lz + half)*(lz + half) < rr ) && !read_blockAt({bx + 1, by, bz - 1})->empty();
+
+    return center || west || east || north || south || north_west || north_east || south_west || south_east;
+}
+
+bool World::cyl_collide(pos_t pos, float rad, float height, float piv) const {
+    const float step = 0.5f;
+    float ySlice = piv;
+    while (ySlice >= piv - height) {
+        pos_t slicePos = pos;
+        slicePos.y += ySlice;
+        if (disc_collide(slicePos, rad))
+            return true;
+        ySlice -= step;
+    }
+    if (ySlice < (piv - height)) {
+        if (disc_collide({pos.x, pos.y + piv - height, pos.z}, rad))
+            return true;
+    }
+    return false;
+}
+
+
+
 void World::shift(int dx, int dy) {
     if (dx > 1 || dx < -1 || dy > 1 || dy < -1) {
         LOG_ERR("invalid shift %d,%d !!", dx, dy);

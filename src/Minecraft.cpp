@@ -82,7 +82,33 @@ void Minecraft::user_update(float dt, Keyboard const& kb, Mouse const& mouse) {
         move -= (V3_UP * speed * dt);        
     }
 
-    camera.getPos() += move;
+    
+    pos_t oldpos = camera.readPos();
+    pos_t newpos = oldpos + move;
+
+    if (!world.cyl_collide(newpos)) {
+        camera.getPos() = newpos;
+    } else {
+        pos_t attempt = oldpos;
+
+        attempt.x += move.x;
+        if (!world.cyl_collide(attempt)) {
+            camera.getPos() = attempt;
+        }
+
+        attempt = camera.readPos();
+        attempt.z += move.z;
+        if (!world.cyl_collide(attempt)) {
+            camera.getPos() = attempt;
+        }
+
+        attempt = camera.readPos();
+        attempt.y += move.y;
+        if (!world.cyl_collide(attempt)) {
+            camera.getPos() = attempt;
+        }
+    }
+
 
     cpos_t cpos = pos_to_cpos(camera.readPos());
     if (cpos != world.center()) {

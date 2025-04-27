@@ -58,6 +58,9 @@ struct World : public ECS<> {
 
     RaycastResult raycast(Ray const& r, float maxlen = 5.f);
 
+    bool disc_collide(pos_t pos, float rad = 0.4f) const;
+    bool cyl_collide(pos_t pos, float rad = 0.4f, float height = 1.72, float piv = 0.1f) const;
+
     inline cpos_t center() const {return _center;}
     void shift(int dx, int dy);
     void shift_to(cpos_t center);
