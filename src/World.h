@@ -36,16 +36,6 @@ namespace std {
     };
 }
 
-struct RaycastResult {
-    const Block* block;
-    bpos_t bpos;
-    pos_t pos;
-    orientation_e face;
-    float len;
-    inline bool miss() const {return !block;}
-    inline bool hit() const {return block;}
-};
-
 struct World : public ECS<> {
     World(WorldGenerator&);
     ~World();
@@ -55,6 +45,16 @@ struct World : public ECS<> {
     Chunk const* read_chunkAt(cpos_t pos) const;
     Block* blockAt(bpos_t pos);
     Block const* read_blockAt(bpos_t pos) const;
+
+    struct RaycastResult {
+        const Block* block;
+        bpos_t bpos;
+        pos_t pos;
+        orientation_e face;
+        float len;
+        inline bool miss() const {return !block;}
+        inline bool hit() const {return block;}
+    };
 
     RaycastResult raycast(Ray const& r, float maxlen = 5.f);
 

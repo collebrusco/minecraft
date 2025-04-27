@@ -28,7 +28,7 @@ struct Minecraft : public Driver {
     World world;
     WorldRenderer wrenderer;
 
-    RaycastResult cast;
+    World::RaycastResult cast;
 
     DebugUI dbui;
 

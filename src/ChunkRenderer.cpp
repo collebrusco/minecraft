@@ -161,22 +161,16 @@ void ChunkRenderer::render() const {
 }
 
 void ChunkRenderer::emit_cube(int sx, int sy, int sz) {
-    uint32_t x = sx; uint32_t y = sy; uint32_t z = sz;
-    instance_data.push_back((instance_u){.f.x = x, .f.height = y, .f.y = z, .f.orientation = TOP}.val);
-    instance_data.push_back((instance_u){.f.x = x, .f.height = y, .f.y = z, .f.orientation = BOT}.val);
-    instance_data.push_back((instance_u){.f.x = x, .f.height = y, .f.y = z, .f.orientation = NORTH}.val);
-    instance_data.push_back((instance_u){.f.x = x, .f.height = y, .f.y = z, .f.orientation = SOUTH}.val);
-    instance_data.push_back((instance_u){.f.x = x, .f.height = y, .f.y = z, .f.orientation = EAST}.val);
-    instance_data.push_back((instance_u){.f.x = x, .f.height = y, .f.y = z, .f.orientation = WEST}.val);
+    uint32_t x = sx, y = sy, z = sz;
+    instance_data.push_back(instance_u{instance_u::instance_data{x, y, z, TOP, 0}}.val);
+    instance_data.push_back(instance_u{instance_u::instance_data{x, y, z, BOT, 0}}.val);
+    instance_data.push_back(instance_u{instance_u::instance_data{x, y, z, NORTH, 0}}.val);
+    instance_data.push_back(instance_u{instance_u::instance_data{x, y, z, SOUTH, 0}}.val);
+    instance_data.push_back(instance_u{instance_u::instance_data{x, y, z, EAST, 0}}.val);
+    instance_data.push_back(instance_u{instance_u::instance_data{x, y, z, WEST, 0}}.val);
 }
 
 void ChunkRenderer::emit_face(orientation_e o, face_e face, int sx, int sy, int sz) {
-    uint32_t x = sx; uint32_t y = sy; uint32_t z = sz;
-    instance_data.push_back((instance_u){
-        .f.x = x,
-        .f.y = z,
-        .f.height = y,
-        .f.orientation = o,
-        .f.tex = face
-    }.val);
+    uint32_t x = sx, y = sy, z = sz;
+    instance_data.push_back(instance_u{instance_u::instance_data{x, z, y, o, (uint32_t)face}}.val);
 }

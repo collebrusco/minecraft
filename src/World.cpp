@@ -91,7 +91,7 @@ Block const *World::read_blockAt(bpos_t pos) const {
     return chunk->blockAt(bpos_to_local(pos));
 }
 
-RaycastResult World::raycast(Ray const& r, float maxlen) {
+World::RaycastResult World::raycast(Ray const& r, float maxlen) {
     const glm::vec3 origin = r.pos;
     const glm::vec3 dir = glm::normalize(r.dir);
 
