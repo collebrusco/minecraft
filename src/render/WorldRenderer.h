@@ -6,7 +6,7 @@
 #ifndef WORLD_RENDERER_H
 #define WORLD_RENDERER_H
 #include "standard.h"
-#include "World.h"
+#include "data/World.h"
 #include "ChunkRenderer.h"
 
 struct WorldRenderer {

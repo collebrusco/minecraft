@@ -7,8 +7,8 @@
 #define CHUNK_RENDERER_H
 #include <vector>
 #include <flgl.h>
-#include "Chunk.h"
-#include "Blocks.h"
+#include "data/Chunk.h"
+#include "data/Blocks.h"
 
 struct ChunkRenderer {
 

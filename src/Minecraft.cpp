@@ -1,7 +1,7 @@
 #include "Minecraft.h"
 #include <flgl/logger.h>
-#include "OutlineRenderer.h"
-#include "BasicRenderer.h"
+#include "render/OutlineRenderer.h"
+#include "render/BasicRenderer.h"
 using namespace glm;
 LOG_MODULE(mc);
 
@@ -10,7 +10,7 @@ Minecraft::Minecraft() : world(wgen) {
     const float kb = (static_cast<float>(sizeof(Block)) * CHUNK_SIZE_F * CHUNK_SIZE_F * MAX_HEIGHT_F) / 1024.f;
     const float mb = kb / 1024.f;
     LOG_INF("minecraft init");
-    LOG_INF("chunk size: %.0f KB (%.2f MB);", kb, mb);
+    LOG_INF("chunk size: %.0f KB (%.2f MB)", kb, mb);
     LOG_INF("world %.1f MB (%.2f GB)", mb * RENDER_DISTANCE_F * RENDER_DISTANCE_F, mb * RENDER_DISTANCE_F * RENDER_DISTANCE_F * (1./1024.));
 }
 
@@ -82,7 +82,7 @@ void Minecraft::user_update(float dt, Keyboard const& kb, Mouse const& mouse) {
         move -= (V3_UP * speed * dt);        
     }
 
-    
+
     pos_t oldpos = camera.readPos();
     pos_t newpos = oldpos + move;
 

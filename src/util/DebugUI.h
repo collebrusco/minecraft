@@ -5,7 +5,7 @@
 #ifndef DEBUG_UI_H
 #define DEBUG_UI_H
 #include "../standard.h"
-#include "../Chunk.h"
+#include "data/Chunk.h"
 extern size_t nallocs;
 
 #define DBUISZ (16)

@@ -9,9 +9,10 @@
 #include <flgl/ecs.h>
 #include <flgl/glm.h>
 #include "standard.h"
-#include "Chunk.h"
-#include "ChunkRenderer.h"
-#include "WorldRenderer.h"
+#include "data/Chunk.h"
+#include "data/World.h"
+#include "render/ChunkRenderer.h"
+#include "render/WorldRenderer.h"
 #include "util/DebugUI.h"
 
 struct Minecraft : public Driver {
