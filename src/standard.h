@@ -58,6 +58,13 @@ extern const glm::ivec3 IDIRECTIONS[6];
 #define V3_EAST    (DIRECTIONS[EAST])
 #define V3_WEST    (DIRECTIONS[WEST])
 
+#define V3_POSY    (DIRECTIONS[TOP])
+#define V3_NEGY    (DIRECTIONS[BOT])
+#define V3_POSZ    (DIRECTIONS[NORTH])
+#define V3_NEGZ    (DIRECTIONS[SOUTH])
+#define V3_POSX    (DIRECTIONS[EAST])
+#define V3_NEGX    (DIRECTIONS[WEST])
+
 #define V2_NORTH   (glm::vec2{ 0.f,  1.f})
 #define V2_SOUTH   (glm::vec2{ 0.f, -1.f})
 #define V2_EAST    (glm::vec2{ 1.f,  0.f})

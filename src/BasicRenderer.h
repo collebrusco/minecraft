@@ -28,4 +28,15 @@ struct WorldPointRenderer {
     static void render(pos_t pos);
 };
 
+struct WorldAxesRenderer {
+    static VertexArray vao;
+    static VertexBuffer<Vt_pn> vbo;
+    static Shader shader;
+    static void init();
+    static void destroy();
+
+    static void sync(Camera& cam);
+    static void render(pos_t pos);
+};
+
 #endif /* BASIC_RENDERER_H */

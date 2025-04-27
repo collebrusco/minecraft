@@ -22,22 +22,23 @@ struct DebugUI {
     void init() {
         TextRenderer::init_text_rendering();
         text.init();
-        set_text(-1.,-1.,-1.,-1.,-1.,-1.);
+        set_text(-1.,-1.,-1.,-1.,-1.,-1.,glm::vec3(-1.));
     }
     void destroy() {
         text.destroy();
         text.destroy_text_rendering();
     }
 
-    void set_text(double ram, double c, double b, double r, double a, double d) {
+    void set_text(double ram, double c, double b, double r, double a, double d, glm::vec3 pos) {
         text.set_text(
+            "pos:(%.1f,%.1f,%.1f)\n"
             "ram:    %.2fmb\n"
             "calc:   %.0fus\n"
             "buffer: %.0fus\n"
             "render: %.2fms\n"
             "all:    %.2fms\n"
             "fps:    %.0f",
-            ram / (1024.f * 1024.f), c, b, r / 1000.f, a / 1000.f, 1.f / d
+            pos.x, pos.y, pos.z, ram / (1024.f * 1024.f), c, b, r / 1000.f, a / 1000.f, 1.f / d
         );
     }
 
@@ -48,7 +49,7 @@ struct DebugUI {
       tall(Stopwatch::MICROSECONDS) {
     }
 
-    void tick(double dt) {
+    void tick(double dt, glm::vec3 pos) {
         cpu[i] = tcpu.stop_reset();
         buf[i] = tbuf.stop_reset();
         ren[i] = tren.stop_reset();
@@ -70,7 +71,7 @@ struct DebugUI {
             ta /= static_cast<double>(DBUISZ);
             td /= static_cast<double>(DBUISZ);
             size_t ram = nallocs * sizeof(Chunk);
-            set_text(ram, tc, tb, tr, ta, td);
+            set_text(ram, tc, tb, tr, ta, td, pos);
         }
         text.render(10, 45, 2 * window.frame_to_window);
     }

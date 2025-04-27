@@ -28,6 +28,8 @@ void Minecraft::user_create() {
 
     WorldPointRenderer::init();
 
+    WorldAxesRenderer::init();
+
     camera.enable_look();
     camera.getPos() = vec3{14.f, 16.f, 14.f};
     camera.getFar() = 700.f;
@@ -106,6 +108,7 @@ void Minecraft::user_render() {
     gl.set_clear_color(135./255., 206./255., 235./255.);
     gl.clear();
 
+        glFinish();
         dbui.tcpu.start();
     wrenderer.update(world);
         dbui.tcpu.stop();
@@ -125,12 +128,14 @@ void Minecraft::user_render() {
     if (cast.hit()) {
         OutlineRenderer::sync(camera);
         OutlineRenderer::draw(cast.bpos);
+        WorldAxesRenderer::sync(camera);
+        WorldAxesRenderer::render(cast.pos);
     }
 
     PointRenderer::render();
 
         dbui.tall.stop();
-        dbui.tick(dt());
+        dbui.tick(dt(), camera.readPos());
 
 }
 
@@ -140,5 +145,6 @@ void Minecraft::user_destroy() {
     ChunkRenderer::destroy_chunk_rendering();
     PointRenderer::destroy();
     WorldPointRenderer::destroy();
+    WorldAxesRenderer::destroy();
     wrenderer.destroy();
 }
