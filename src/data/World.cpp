@@ -58,7 +58,7 @@ Chunk *World::ChunkStore::get_or_gen(cpos_t pos, WorldGenerator const &gen) {
 #define ITER_WORLD_BUF(iter) int iter = 0; iter < RENDER_DISTANCE * RENDER_DISTANCE; iter++
 #define ITER_WORLD_BUFXY(iter) int iter = 0; iter < RENDER_DISTANCE; iter++
 
-World::World(WorldGenerator& g) : generator(g), _center(0) {
+World::World(Camera& cam, WorldGenerator& g) : camera(cam), generator(g), _center(0) {
     for (ITER_WORLD_BUFXY(i)) {
         for (ITER_WORLD_BUFXY(j)) {
             cpos_t pos(i - (RENDER_DISTANCE_R), j - (RENDER_DISTANCE_R));

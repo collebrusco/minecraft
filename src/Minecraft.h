@@ -11,6 +11,7 @@
 #include "standard.h"
 #include "data/Chunk.h"
 #include "data/World.h"
+#include "game/game.h"
 #include "render/ChunkRenderer.h"
 #include "render/WorldRenderer.h"
 #include "util/DebugUI.h"
@@ -26,10 +27,8 @@ struct Minecraft : public Driver {
     MousePerspectiveCamera camera;
 
     BasicWorldGen wgen;
-    World world;
+    Game game;
     WorldRenderer wrenderer;
-
-    World::RaycastResult cast;
 
     DebugUI dbui;
 

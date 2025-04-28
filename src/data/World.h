@@ -37,9 +37,11 @@ namespace std {
 }
 
 struct World : public ECS<> {
-    World(WorldGenerator&);
-    ~World();
+    World(Camera& cam, WorldGenerator&);
+    virtual ~World();
     NO_COPY_OR_MOVE(World);
+
+    Camera& camera;
 
     Chunk* chunkAt(cpos_t pos);
     Chunk const* read_chunkAt(cpos_t pos) const;

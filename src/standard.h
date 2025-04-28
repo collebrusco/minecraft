@@ -9,6 +9,8 @@
 #include <flgl/logger.h>
 #include <flgl/tools.h>
 #include <flgl/geometry.h>
+#include <flgl/allocators.h>
+#include <flgl/ecs.h>
 
 typedef size_t blockID;
 
@@ -24,6 +26,7 @@ typedef size_t blockID;
 #define RENDER_DISTANCE_F (static_cast<float>(RENDER_DISTANCE))
 
 typedef glm::vec3  pos_t;   /* absolute floating point position */
+typedef glm::vec3  vec_t;   /* arbitrary vector in game space */
 typedef glm::ivec3 bpos_t;  /* integer block position, same scale as pos_t. when literally translated to absolute position, the bpos of a block is its minimum corner. */
 typedef glm::ivec2 cpos_t;  /* integer chunk position, CHUNK_SIZE times coarser than pos_t. i.e., chunk at cpos=(0,0) contains all bpos w/ x,z in [0, CHUNK_SIZE) chunk positions are in the xz plane only because each chunk contains all y values. Literally translated, chunk pos is the x and z coord of the minimum corner of the chunk */
 

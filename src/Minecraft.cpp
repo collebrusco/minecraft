@@ -6,7 +6,7 @@ using namespace glm;
 LOG_MODULE(mc);
 
 
-Minecraft::Minecraft() : world(wgen) {
+Minecraft::Minecraft() : game(camera, wgen) {
     const float kb = (static_cast<float>(sizeof(Block)) * CHUNK_SIZE_F * CHUNK_SIZE_F * MAX_HEIGHT_F) / 1024.f;
     const float mb = kb / 1024.f;
     LOG_INF("minecraft init");
@@ -37,96 +37,15 @@ void Minecraft::user_create() {
     camera.update();
 }
 
-void Minecraft::user_update(float dt, Keyboard const& kb, Mouse const& mouse) {
+void Minecraft::user_update(float dt, Keyboard const& kb, Mouse const& mouse) { (void)kb; (void)mouse;
     static bool wf = false;
     dbui.tall.start();
     if (window.keyboard[GLFW_KEY_ESCAPE].down) this->close();
     if (window.keyboard[GLFW_KEY_K].pressed) wf = !wf;
     gl.wireframe(wf);
 
-    vec3 move = vec3(0.);
-    vec3 fwd = camera.readLook(); fwd.y = 0;
-    vec3 rht = cross(camera.readLook(), camera.readUp());
-    float speed = 4.;
-    if (window.keyboard[GLFW_KEY_PERIOD].down) {
-        speed *= 5.;
-    }
-    if (window.keyboard[GLFW_KEY_COMMA].down) {
-        speed *= 5.;
-    }
-    if (window.keyboard[GLFW_KEY_W].down) {
-        move += fwd;
-    }
-    if (window.keyboard[GLFW_KEY_A].down) {
-        move -= rht;
-    }
-    if (window.keyboard[GLFW_KEY_S].down) {
-        move -= fwd;
-    }
-    if (window.keyboard[GLFW_KEY_D].down) {
-        move += rht;
-    }
-    if (window.keyboard[GLFW_KEY_L].pressed) {
-        static bool mg = true;
-        mg = !mg;
-        window.set_mouse_grab(mg);
-    }
-    if (length(move) > 0.) {
-        move = normalize(move);
-    }
-    move *= speed * dt;
-    if (window.keyboard[GLFW_KEY_SPACE].down) {
-        move += (V3_UP * speed * dt);
-    }
-    if (window.keyboard[GLFW_KEY_LEFT_SHIFT].down) {
-        move -= (V3_UP * speed * dt);        
-    }
+    game.tick(dt);
 
-
-    pos_t oldpos = camera.readPos();
-    pos_t newpos = oldpos + move;
-
-    if (!world.cyl_collide(newpos)) {
-        camera.getPos() = newpos;
-    } else {
-        pos_t attempt = oldpos;
-
-        attempt.x += move.x;
-        if (!world.cyl_collide(attempt)) {
-            camera.getPos() = attempt;
-        }
-
-        attempt = camera.readPos();
-        attempt.z += move.z;
-        if (!world.cyl_collide(attempt)) {
-            camera.getPos() = attempt;
-        }
-
-        attempt = camera.readPos();
-        attempt.y += move.y;
-        if (!world.cyl_collide(attempt)) {
-            camera.getPos() = attempt;
-        }
-    }
-
-
-    cpos_t cpos = pos_to_cpos(camera.readPos());
-    if (cpos != world.center()) {
-        world.shift_to(cpos);
-    }
-
-    cast = world.raycast(Ray(camera.readPos(), camera.readLook()));
-
-    if (mouse.left().pressed && cast.hit()) {
-        Block* b = world.blockAt(cast.bpos);
-        *b = Block::null();
-    }
-
-    if (mouse.right().pressed && cast.hit()) {
-        Block* place = world.blockAt(cast.bpos + IDIRECTIONS[cast.face]);
-        place->type = &Blocks::stone;
-    }
-    
     camera.update();
 }
 
@@ -136,11 +55,11 @@ void Minecraft::user_render() {
 
         glFinish();
         dbui.tcpu.start();
-    wrenderer.update(world);
+    wrenderer.update(game);
         dbui.tcpu.stop();
 
         dbui.tbuf.start();
-    wrenderer.buffer(world);
+    wrenderer.buffer(game);
         glFinish();
         dbui.tbuf.stop();
     wrenderer.sync(camera);
@@ -151,11 +70,11 @@ void Minecraft::user_render() {
         dbui.tren.stop();
 
 
-    if (cast.hit()) {
+    if (game.cast.hit()) {
         OutlineRenderer::sync(camera);
-        OutlineRenderer::draw(cast.bpos);
+        OutlineRenderer::draw(game.cast.bpos);
         WorldAxesRenderer::sync(camera);
-        WorldAxesRenderer::render(cast.pos);
+        WorldAxesRenderer::render(game.cast.pos);
     }
 
     PointRenderer::render();
