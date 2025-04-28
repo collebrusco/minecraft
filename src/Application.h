@@ -1,5 +1,5 @@
 /** 
- * Minecraft.h 
+ * Application.h 
  * created 04/16/25 by frank collebrusco
  */
 #ifndef MINECRAFT_H
@@ -15,9 +15,9 @@
 #include "render/WorldRenderer.h"
 #include "util/DebugUI.h"
 
-struct Minecraft : public Driver {
+struct Application : public Driver {
 
-    Minecraft();
+    Application();
     virtual void user_create() override final;
     virtual void user_update(float dt, Keyboard const& kb, Mouse const& mouse) override final;
     virtual void user_render() override final;

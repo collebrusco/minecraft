@@ -1,4 +1,4 @@
-#include "Minecraft.h"
+#include "Application.h"
 #include <flgl/logger.h>
 #include "render/OutlineRenderer.h"
 #include "render/BasicRenderer.h"
@@ -6,7 +6,7 @@ using namespace glm;
 LOG_MODULE(mc);
 
 
-Minecraft::Minecraft() : world(wgen) {
+Application::Application() : world(wgen) {
     const float kb = (static_cast<float>(sizeof(Block)) * CHUNK_SIZE_F * CHUNK_SIZE_F * MAX_HEIGHT_F) / 1024.f;
     const float mb = kb / 1024.f;
     LOG_INF("minecraft init");
@@ -14,7 +14,7 @@ Minecraft::Minecraft() : world(wgen) {
     LOG_INF("world %.1f MB (%.2f GB)", mb * RENDER_DISTANCE_F * RENDER_DISTANCE_F, mb * RENDER_DISTANCE_F * RENDER_DISTANCE_F * (1./1024.));
 }
 
-void Minecraft::user_create() {
+void Application::user_create() {
     gl.init();
     window.create("minecraft", 1280, 720);
 
@@ -37,7 +37,7 @@ void Minecraft::user_create() {
     camera.update();
 }
 
-void Minecraft::user_update(float dt, Keyboard const& kb, Mouse const& mouse) {
+void Application::user_update(float dt, Keyboard const& kb, Mouse const& mouse) {
     static bool wf = false;
     dbui.tall.start();
     if (window.keyboard[GLFW_KEY_ESCAPE].down) this->close();
@@ -130,7 +130,7 @@ void Minecraft::user_update(float dt, Keyboard const& kb, Mouse const& mouse) {
     camera.update();
 }
 
-void Minecraft::user_render() {
+void Application::user_render() {
     gl.set_clear_color(135./255., 206./255., 235./255.);
     gl.clear();
 
@@ -165,7 +165,7 @@ void Minecraft::user_render() {
 
 }
 
-void Minecraft::user_destroy() {
+void Application::user_destroy() {
     dbui.destroy();
     TextRenderer::destroy_text_rendering();
     ChunkRenderer::destroy_chunk_rendering();
