@@ -83,6 +83,15 @@ void EntityRenderer::destroy(){
     entity_shader.destroy();
     texture.destroy();
 }
+
+struct ModelPart {
+    glm::mat4 mat;
+    struct {
+        glm::vec2 mi, mx;
+    } uvs[ORIENTATION_LAST + 1];
+};
+
+/** make this \/ return those /\ */
 std::vector<glm::mat4> getSteveModelMatrices(float t, bool isHead = true) {
     std::vector<glm::mat4> parts;
 
