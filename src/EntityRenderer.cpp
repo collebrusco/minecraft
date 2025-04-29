@@ -5,7 +5,7 @@
  ElementBuffer EntityRenderer::ibo;
 
  Shader EntityRenderer::entity_shader;
-
+ Texture texture; 
 void EntityRenderer::init(){
    const Vt_pun cube_verts[] = {
        // Front face (+Z)
@@ -58,6 +58,9 @@ void EntityRenderer::init(){
        // Bottom face
        20, 21, 22, 20, 22, 23};
    entity_shader = Shader::from_source("entity_vert", "entity_frag");
+   // TODO break out into its own thing
+   texture = Texture::from_file("1.8_Skin_Template");
+   texture.pixelate();
    vao.create_bind();
    vbo.create_bind();
    vao.attach(vbo);
@@ -78,6 +81,7 @@ void EntityRenderer::destroy(){
     vbo.destroy();
     ibo.destroy();
     entity_shader.destroy();
+    texture.destroy();
 }
 std::vector<glm::mat4> getSteveModelMatrices(float t, bool isHead = true) {
     std::vector<glm::mat4> parts;
