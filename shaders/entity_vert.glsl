@@ -6,7 +6,10 @@ layout (location = 2) in vec3 aNorm;
 uniform mat4 uModel;
 uniform mat4 uView;
 uniform mat4 uProj;
-uniform mat4 uModelPart;
+uniform mat4 uModelPartMat;
+uniform vec2 uUVMin[6];
+uniform vec2 uUVMax[6];
+
 out vec3 iNorm;
 out vec2 iUV;
 
@@ -25,10 +28,19 @@ out vec2 iUV;
 #define EAST     (4)
 #define WEST     (5)
 
+uint orient_from_normal(vec3 norm) {
+    if (norm == V3_UP) return TOP;
+    if (norm == V3_DOWN) return BOT;
+    if (norm == V3_NORTH) return NORTH;
+    if (norm == V3_SOUTH) return SOUTH;
+    if (norm == V3_EAST) return EAST;
+    if (norm == V3_WEST) return WEST;
+    return 0u; // default case (shouldn't happen ideally)
+}
 void main() {
-    iNorm = aNorm;
     // determine what face you are on 
-    gl_Position = uProj * uView * uModel * uModelPart * vec4(aPos, 1.0f); 
-    iUV = aUV;
-    //gl_Position = vec4(aPos, 1.0f);
+    iNorm = aNorm;
+    uint face = orient_from_normal(aNorm);
+    iUV = mix(uUVMin[face], uUVMax[face], aUv);
+    gl_Position = uProj * uView * uModel * uModelPartMat * vec4(aPos, 1.0f); 
 }
