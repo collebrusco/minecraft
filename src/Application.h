@@ -11,6 +11,7 @@
 #include "standard.h"
 #include "data/Chunk.h"
 #include "data/World.h"
+#include "data/State.h"
 #include "render/ChunkRenderer.h"
 #include "render/WorldRenderer.h"
 #include "util/DebugUI.h"
@@ -23,13 +24,13 @@ struct Application : public Driver {
     virtual void user_render() override final;
     virtual void user_destroy() override final;
 
-    MousePerspectiveCamera camera;
-
     BasicWorldGen wgen;
-    World world;
+
+    State state;
+    World::RaycastResult cast;
+
     WorldRenderer wrenderer;
 
-    World::RaycastResult cast;
 
     DebugUI dbui;
 

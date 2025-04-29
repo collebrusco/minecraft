@@ -6,7 +6,7 @@ using namespace glm;
 LOG_MODULE(mc);
 
 
-Application::Application() : world(wgen) {
+Application::Application() : state(wgen) {
     const float kb = (static_cast<float>(sizeof(Block)) * CHUNK_SIZE_F * CHUNK_SIZE_F * MAX_HEIGHT_F) / 1024.f;
     const float mb = kb / 1024.f;
     LOG_INF("minecraft init");
@@ -30,43 +30,43 @@ void Application::user_create() {
 
     WorldAxesRenderer::init();
 
-    camera.enable_look();
-    camera.getPos() = vec3{14.f, 16.f, 14.f};
-    camera.getFar() = 700.f;
-    camera.getNear() = 0.01f;
-    camera.update();
+    state.camera.enable_look();
+    state.camera.getPos() = vec3{14.f, 16.f, 14.f};
+    state.camera.getFar() = 700.f;
+    state.camera.getNear() = 0.01f;
+    state.camera.update();
 }
 
-void Application::user_update(float dt, Keyboard const& kb, Mouse const& mouse) {
+void Application::user_update(float dt, Keyboard const& kb, Mouse const& mouse) { (void)kb; (void)mouse;
     static bool wf = false;
     dbui.tall.start();
-    if (window.keyboard[GLFW_KEY_ESCAPE].down) this->close();
-    if (window.keyboard[GLFW_KEY_K].pressed) wf = !wf;
+    if (kb[GLFW_KEY_ESCAPE].down) this->close();
+    if (kb[GLFW_KEY_K].pressed) wf = !wf;
     gl.wireframe(wf);
 
     vec3 move = vec3(0.);
-    vec3 fwd = camera.readLook(); fwd.y = 0;
-    vec3 rht = cross(camera.readLook(), camera.readUp());
+    vec3 fwd = state.camera.readLook(); fwd.y = 0;
+    vec3 rht = cross(state.camera.readLook(), state.camera.readUp());
     float speed = 4.;
-    if (window.keyboard[GLFW_KEY_PERIOD].down) {
+    if (kb[GLFW_KEY_PERIOD].down) {
         speed *= 5.;
     }
-    if (window.keyboard[GLFW_KEY_COMMA].down) {
+    if (kb[GLFW_KEY_COMMA].down) {
         speed *= 5.;
     }
-    if (window.keyboard[GLFW_KEY_W].down) {
+    if (kb[GLFW_KEY_W].down) {
         move += fwd;
     }
-    if (window.keyboard[GLFW_KEY_A].down) {
+    if (kb[GLFW_KEY_A].down) {
         move -= rht;
     }
-    if (window.keyboard[GLFW_KEY_S].down) {
+    if (kb[GLFW_KEY_S].down) {
         move -= fwd;
     }
-    if (window.keyboard[GLFW_KEY_D].down) {
+    if (kb[GLFW_KEY_D].down) {
         move += rht;
     }
-    if (window.keyboard[GLFW_KEY_L].pressed) {
+    if (kb[GLFW_KEY_L].pressed) {
         static bool mg = true;
         mg = !mg;
         window.set_mouse_grab(mg);
@@ -75,59 +75,59 @@ void Application::user_update(float dt, Keyboard const& kb, Mouse const& mouse) 
         move = normalize(move);
     }
     move *= speed * dt;
-    if (window.keyboard[GLFW_KEY_SPACE].down) {
+    if (kb[GLFW_KEY_SPACE].down) {
         move += (V3_UP * speed * dt);
     }
-    if (window.keyboard[GLFW_KEY_LEFT_SHIFT].down) {
+    if (kb[GLFW_KEY_LEFT_SHIFT].down) {
         move -= (V3_UP * speed * dt);        
     }
 
 
-    pos_t oldpos = camera.readPos();
+    pos_t oldpos = state.camera.readPos();
     pos_t newpos = oldpos + move;
 
-    if (!world.cyl_collide(newpos)) {
-        camera.getPos() = newpos;
+    if (!state.cyl_collide(newpos)) {
+        state.camera.getPos() = newpos;
     } else {
         pos_t attempt = oldpos;
 
         attempt.x += move.x;
-        if (!world.cyl_collide(attempt)) {
-            camera.getPos() = attempt;
+        if (!state.cyl_collide(attempt)) {
+            state.camera.getPos() = attempt;
         }
 
-        attempt = camera.readPos();
+        attempt = state.camera.readPos();
         attempt.z += move.z;
-        if (!world.cyl_collide(attempt)) {
-            camera.getPos() = attempt;
+        if (!state.cyl_collide(attempt)) {
+            state.camera.getPos() = attempt;
         }
 
-        attempt = camera.readPos();
+        attempt = state.camera.readPos();
         attempt.y += move.y;
-        if (!world.cyl_collide(attempt)) {
-            camera.getPos() = attempt;
+        if (!state.cyl_collide(attempt)) {
+            state.camera.getPos() = attempt;
         }
     }
 
 
-    cpos_t cpos = pos_to_cpos(camera.readPos());
-    if (cpos != world.center()) {
-        world.shift_to(cpos);
+    cpos_t cpos = pos_to_cpos(state.camera.readPos());
+    if (cpos != state.center()) {
+        state.shift_to(cpos);
     }
 
-    cast = world.raycast(Ray(camera.readPos(), camera.readLook()));
+    cast = state.raycast(Ray(state.camera.readPos(), state.camera.readLook()));
 
     if (mouse.left().pressed && cast.hit()) {
-        Block* b = world.blockAt(cast.bpos);
+        Block* b = state.blockAt(cast.bpos);
         *b = Block::null();
     }
 
     if (mouse.right().pressed && cast.hit()) {
-        Block* place = world.blockAt(cast.bpos + IDIRECTIONS[cast.face]);
+        Block* place = state.blockAt(cast.bpos + IDIRECTIONS[cast.face]);
         place->type = &Blocks::stone;
     }
     
-    camera.update();
+    state.camera.update();
 }
 
 void Application::user_render() {
@@ -136,14 +136,14 @@ void Application::user_render() {
 
         glFinish();
         dbui.tcpu.start();
-    wrenderer.update(world);
+    wrenderer.update(state);
         dbui.tcpu.stop();
 
         dbui.tbuf.start();
-    wrenderer.buffer(world);
+    wrenderer.buffer(state);
         glFinish();
         dbui.tbuf.stop();
-    wrenderer.sync(camera);
+    wrenderer.sync(state.camera);
 
         dbui.tren.start();
     wrenderer.render();
@@ -152,16 +152,16 @@ void Application::user_render() {
 
 
     if (cast.hit()) {
-        OutlineRenderer::sync(camera);
+        OutlineRenderer::sync(state.camera);
         OutlineRenderer::draw(cast.bpos);
-        WorldAxesRenderer::sync(camera);
+        WorldAxesRenderer::sync(state.camera);
         WorldAxesRenderer::render(cast.pos);
     }
 
     PointRenderer::render();
 
         dbui.tall.stop();
-        dbui.tick(dt(), camera.readPos());
+        dbui.tick(dt(), state.camera.readPos());
 
 }
 
