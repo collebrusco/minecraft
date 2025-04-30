@@ -147,7 +147,11 @@ Model CreeperModel::get() const{
     glm::vec3 headSize(8 * 0.0625f, 8 * 0.0625f, 8 * 0.0625f); // 8x8x8
     glm::vec3 bodySize(8 * 0.0625f, 12 * 0.0625f, 4 * 0.0625f); // 8x12x4
     glm::vec3 legSize(4 * 0.0625f, 6 * 0.0625f, 4 * 0.0625f);  // 4x6x4
-
+    
+    float maxAngle = glm::pi<float>() / 8.0f;
+    float frontLeftBackRightAngle  =  std::sin(t) * maxAngle;
+    float frontRightBackLeftAngle = -std::sin(t) * maxAngle;
+    
     ModelPart head;
     glm::vec3 headOffset = glm::vec3(0.0f, legSize.y + bodySize.y + headSize.y / 2.0f, 0.0f);
     head.mat = glm::translate(glm::mat4(1.0f), headOffset);
@@ -180,8 +184,12 @@ Model CreeperModel::get() const{
     };
 
     for (int i = 0; i < 4; ++i) {
+        float angle = (i == 0 || i == 3) ? frontLeftBackRightAngle : frontRightBackLeftAngle;
         ModelPart leg;
         glm::mat4 legMat = glm::translate(glm::mat4(1.0f), legOffsets[i]);
+        legMat = glm::translate(legMat, glm::vec3(0.0f, legSize.y / 2.0f, 0.0f));
+        legMat = legMat * glm::toMat4(glm::angleAxis(angle, glm::vec3(1, 0, 0)));
+        legMat = glm::translate(legMat, glm::vec3(0.0f, -legSize.y / 2.0f, 0.0f));
         legMat = glm::scale(legMat, legSize);
         leg.mat = legMat;
         leg.uvs[TOP]   = { glm::vec2(0.0625f, 0.375f), glm::vec2(0.125f, 0.5f) };

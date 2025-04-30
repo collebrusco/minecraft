@@ -89,8 +89,8 @@ void EntityRenderer::destroy(){
 }
 
 void EntityRenderer::render(Stopwatch const& timer,glm::vec3 pos, glm::vec3 rotation, glm::vec3 scale){
-   // auto modelMats = getSteveModelMatrices(timer.read());
-   Model modelMats = creeper.get();
+    Model modelMats = creeper.get();
+    creeper.setT(timer.read());
     //Model modelMats = steve.get();
     //steve.setT(timer.read());
     glFrontFace(GL_CCW);
