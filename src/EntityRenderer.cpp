@@ -1,11 +1,13 @@
 #include "EntityRenderer.h"
 #define QUAD (0.5f)
- VertexArray EntityRenderer::vao;
- VertexBuffer<Vt_pun> EntityRenderer::vbo;
- ElementBuffer EntityRenderer::ibo;
 
- Shader EntityRenderer::entity_shader;
- Texture texture; 
+VertexArray EntityRenderer::vao;
+VertexBuffer<Vt_pun> EntityRenderer::vbo;
+ElementBuffer EntityRenderer::ibo;
+
+Shader EntityRenderer::entity_shader;
+Texture EntityRenderer::texture; 
+
 void EntityRenderer::init(){
    const Vt_pun cube_verts[] = {
        // Front face (+Z)
@@ -83,14 +85,6 @@ void EntityRenderer::destroy(){
     entity_shader.destroy();
     texture.destroy();
 }
-
-struct ModelPart {
-    glm::mat4 mat;
-    struct {
-        glm::vec2 mi;
-        glm::vec2 mx;
-    } uvs[ORIENTATION_LAST + 1];
-};
 
 /** make this \/ return those /\ */
 std::vector<ModelPart>getSteveModelMatrices(float t, bool isHead = true) {

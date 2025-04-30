@@ -7,6 +7,8 @@
 #define ENTITY_RENDERER_H
 #include "standard.h"
 #include <flgl.h>
+#include "EntityModel.h"
+
 struct EntityRenderer{
     static void init();
     static void destroy();
@@ -15,6 +17,7 @@ struct EntityRenderer{
     static VertexArray vao;
     static VertexBuffer<Vt_pun> vbo;
     static ElementBuffer ibo;
+    static Texture texture;
 
     static Shader entity_shader;
     static void sync(Camera& cam);
