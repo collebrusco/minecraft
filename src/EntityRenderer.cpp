@@ -59,7 +59,7 @@ void EntityRenderer::init(){
        20, 21, 22, 20, 22, 23};
    entity_shader = Shader::from_source("entity_vert", "entity_frag");
    // TODO break out into its own thing
-   texture = Texture::from_file("1.8_Skin_Template");
+   texture = Texture::from_file("steve_template");
    texture.pixelate();
    vao.create_bind();
    vbo.create_bind();
