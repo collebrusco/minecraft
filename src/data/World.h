@@ -21,10 +21,6 @@ private:
     seed_t _seed;
 };
 
-struct BasicWorldGen : public WorldGenerator {
-    virtual void gen_chunk(cpos_t, Chunk* target) const override final;
-};
-
 namespace std {
     template<>
     struct hash<cpos_t> {

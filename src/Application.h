@@ -16,6 +16,7 @@
 #include "render/ChunkRenderer.h"
 #include "render/WorldRenderer.h"
 #include "util/DebugUI.h"
+#include "game/WorldGen.h"
 
 struct Application : public Driver {
 
