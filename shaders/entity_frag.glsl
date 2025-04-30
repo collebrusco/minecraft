@@ -10,7 +10,7 @@ uniform sampler2D uTex;
 void main(){
     vec2 UV = iUV; 
     //UV.x = 1. - UV.x;
-    //UV.y = 1. - UV.y;
+    UV.y = 1. - UV.y;
 
    outColor = texture(uTex, UV);
    //outColor = vec4(iUV, 0., 1.);

@@ -152,24 +152,24 @@ Model CreeperModel::get() const{
     glm::vec3 headOffset = glm::vec3(0.0f, legSize.y + bodySize.y + headSize.y / 2.0f, 0.0f);
     head.mat = glm::translate(glm::mat4(1.0f), headOffset);
     head.mat = glm::scale(head.mat, headSize);
-    head.uvs[TOP]   = { glm::vec2(0.125f, 0.25f), glm::vec2(0.25f, 0.0f) };
-    head.uvs[BOT]   = { glm::vec2(0.25f, 0.25f), glm::vec2(0.375f, 0.0f) };
-    head.uvs[WEST]  = { glm::vec2(0.0f, 0.5f), glm::vec2(0.125f, 0.25f) };
-    head.uvs[NORTH] = { glm::vec2(0.125f, 0.5f), glm::vec2(0.25f, 0.25f) };
-    head.uvs[EAST]  = { glm::vec2(0.25f, 0.5f), glm::vec2(0.375f, 0.25f) };
-    head.uvs[SOUTH] = { glm::vec2(0.375f, 0.5f), glm::vec2(0.5f, 0.25f) };
+    head.uvs[TOP]   = { glm::vec2(0.125f, 0.75f), glm::vec2(0.25f, 1.0f) };
+    head.uvs[BOT]   = { glm::vec2(0.25f, 0.75f), glm::vec2(0.375f, 1.0f) };
+    head.uvs[WEST]  = { glm::vec2(0.0f, 0.5f), glm::vec2(0.125f, 0.75f) };
+    head.uvs[NORTH] = { glm::vec2(0.125f, 0.5f), glm::vec2(0.25f, 0.75f) };
+    head.uvs[EAST]  = { glm::vec2(0.25f, 0.5f), glm::vec2(0.375f, 0.75f) };
+    head.uvs[SOUTH] = { glm::vec2(0.375f, 0.5f), glm::vec2(0.5f, 0.75f) };
     parts.push_back(head); 
 
     ModelPart body;
     glm::vec3 bodyOffset = glm::vec3(0.0f, legSize.y + bodySize.y / 2.0f, 0.0f);
     body.mat = glm::translate(glm::mat4(1.0f), bodyOffset);
     body.mat = glm::scale(body.mat, bodySize);
-    body.uvs[TOP]   = { glm::vec2(0.3125f, 0.625f), glm::vec2(0.4375f, 0.5f) };
-    body.uvs[BOT]   = { glm::vec2(0.4375f, 0.625f), glm::vec2(0.5625f, 0.5f) };
-    body.uvs[WEST]  = { glm::vec2(0.25f, 1.0f), glm::vec2(0.3125f, 0.625f) };
-    body.uvs[NORTH] = { glm::vec2(0.3125f, 1.0f), glm::vec2(0.4375f, 0.625f) };
-    body.uvs[EAST]  = { glm::vec2(0.4375f, 1.0f), glm::vec2(0.5f, 0.625f) };
-    body.uvs[SOUTH] = { glm::vec2(0.5f, 1.0f), glm::vec2(0.625f, 0.625f) };
+    body.uvs[TOP]   = { glm::vec2(0.3125f, 0.375f), glm::vec2(0.4375f, 0.5f) };
+    body.uvs[BOT]   = { glm::vec2(0.4375f, 0.375f), glm::vec2(0.5625f, 0.5f) };
+    body.uvs[WEST]  = { glm::vec2(0.25f, 0.0f), glm::vec2(0.3125f, 0.375f) };
+    body.uvs[NORTH] = { glm::vec2(0.3125f, 0.0f), glm::vec2(0.4375f, 0.375f) };
+    body.uvs[EAST]  = { glm::vec2(0.4375f, 0.0f), glm::vec2(0.5f, 0.375f) };
+    body.uvs[SOUTH] = { glm::vec2(0.5f, 0.0f), glm::vec2(0.625f, 0.375f) };
     parts.push_back(body);
 
     std::vector<glm::vec3> legOffsets = {
@@ -184,15 +184,14 @@ Model CreeperModel::get() const{
         glm::mat4 legMat = glm::translate(glm::mat4(1.0f), legOffsets[i]);
         legMat = glm::scale(legMat, legSize);
         leg.mat = legMat;
-        leg.uvs[TOP]   = { glm::vec2(0.0625f, 0.625f), glm::vec2(0.125f, 0.5f) };
-        leg.uvs[BOT]   = { glm::vec2(0.125f, 0.625f), glm::vec2(0.1875f, 0.5f) };
-        leg.uvs[WEST]  = { glm::vec2(0.0f, 0.8125f), glm::vec2(0.0625f, 0.625f) };
-        leg.uvs[NORTH] = { glm::vec2(0.0625f, 0.8125f), glm::vec2(0.125f, 0.625f) };
-        leg.uvs[EAST]  = { glm::vec2(0.125f, 0.8125f), glm::vec2(0.1875f, 0.625f) };
-        leg.uvs[SOUTH] = { glm::vec2(0.1875f, 0.8125f), glm::vec2(0.25f, 0.625f) };
+        leg.uvs[TOP]   = { glm::vec2(0.0625f, 0.375f), glm::vec2(0.125f, 0.5f) };
+        leg.uvs[BOT]   = { glm::vec2(0.125f, 0.375f), glm::vec2(0.1875f, 0.5f) };
+        leg.uvs[WEST]  = { glm::vec2(0.0f, 0.1875f), glm::vec2(0.0625f, 0.375f) };
+        leg.uvs[NORTH] = { glm::vec2(0.0625f, 0.1875f), glm::vec2(0.125f, 0.375f) };
+        leg.uvs[EAST]  = { glm::vec2(0.125f, 0.1875f), glm::vec2(0.1875f, 0.375f) };
+        leg.uvs[SOUTH] = { glm::vec2(0.1875f, 0.1875f), glm::vec2(0.25f, 0.375f) };
         parts.push_back(leg);
     }
 
     return parts;
 }
-
