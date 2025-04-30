@@ -19,6 +19,7 @@ struct EntityRenderer{
     static ElementBuffer ibo;
     static Texture texture;
 
+    static SteveModel steve;
     static Shader entity_shader;
     static void sync(Camera& cam);
 };
