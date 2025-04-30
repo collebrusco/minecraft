@@ -15,8 +15,10 @@ struct c_Transform {
 };
 
 struct c_Physics {
+    c_Physics() : ofs(), velo(), mass(1.f) {}
     vec_t ofs;
     vec_t velo;
+    float mass;
 };
 
 struct c_Cylinder {

@@ -42,6 +42,7 @@ bool bpos_is_local(bpos_t const& bpos);
 bpos_t bpos_to_local(bpos_t const& global);
 
 #define GRAVITY (32.f /* m/s/s */)
+#define TERMINAL_VELOCITY (78.4f)
 
 typedef enum {
     TOP     = 0,

@@ -9,7 +9,7 @@ void Physics::execute(State& state, const float dt) {
     State::Archetype<c_Transform, c_Physics> a;
     for (entID e : state.view(a)) {
         auto& phys = a.get<c_Physics>();
-        const vec_t A = vec_t(0.f, -GRAVITY, 0.f);
+        const vec_t A = (phys.mass == 0.f || phys.velo.y < -TERMINAL_VELOCITY) ? vec_t(0.f) : vec_t(0.f, -GRAVITY, 0.f);
         const vec_t V = phys.ofs + phys.velo;
         phys.ofs = vec_t(0.f);
         phys.velo += (A * dt);

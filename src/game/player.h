@@ -9,7 +9,6 @@
 #include "actor.h"
 #include "data/World.h"
 
-
 struct PlayerActor : public Actor {
     virtual void take_turn(const entID self, State& state) override final;
 };

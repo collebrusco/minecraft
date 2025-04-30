@@ -9,7 +9,7 @@ Player Player::spawn(World &world, pos_t pos) {
     entID me = world.newEntity();
     world.addComp<c_Transform>(me, pos);
     world.addComp<c_LineOfSight>(me);
-    world.addComp<c_Physics>(me, c_Physics{vec_t(0.f), vec_t(0.f)});
+    world.addComp<c_Physics>(me);
     world.addComp<c_Cylinder>(me, c_Cylinder{0.4, 1.72, .1});
     world.addComp<c_Actor>(me).emplace<PlayerActor>();
     return Player{me};
@@ -19,7 +19,7 @@ Player Player::spawn(World &world, pos_t pos) {
 void PlayerActor::take_turn(const entID self, State& state) {
 
     c_LineOfSight& los = state.getComp<c_LineOfSight>(self);
-    if ((window.mouse.delta.x != 0 || window.mouse.delta.y != 0)) {
+    if (state.player_look && (window.mouse.delta.x != 0 || window.mouse.delta.y != 0)) {
         los.phi += window.mouse.delta.y * sens.y;
         los.theta -= window.mouse.delta.x * sens.x;
         los.updateLU();
@@ -51,13 +51,19 @@ void PlayerActor::take_turn(const entID self, State& state) {
         move = normalize(move);
     }
     move *= speed;
-    if (window.keyboard[GLFW_KEY_SPACE].pressed) {
-        if (state.getComp<c_Cylinder>(self).grounded(state, self))
-            state.getComp<c_Physics>(self).velo.y = 9.f;
+    if (state.creative) {
+        if (window.keyboard[GLFW_KEY_SPACE].down) {
+            move += (V3_UP * speed);        
+        }
+        if (window.keyboard[GLFW_KEY_LEFT_SHIFT].down) {
+            move -= (V3_UP * speed);        
+        }
+    } else {
+        if (window.keyboard[GLFW_KEY_SPACE].pressed) {
+            if (state.getComp<c_Cylinder>(self).grounded(state, self))
+                state.getComp<c_Physics>(self).velo.y = 9.f;
+        }
     }
-    // if (window.keyboard[GLFW_KEY_LEFT_SHIFT].down) {
-    //     move -= (V3_UP * speed);        
-    // }
     /** move */
     state.addOrGetComp<c_Physics>(self).ofs = move;
 

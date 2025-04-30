@@ -37,13 +37,21 @@ void Application::user_create() {
 void Application::user_update(float dt, Keyboard const& kb, Mouse const& mouse) { (void)kb; (void)mouse;
     dbui.tall.start();
     if (kb[GLFW_KEY_ESCAPE].down) this->close();
-    static bool wf = false;
-    if (kb[GLFW_KEY_K].pressed) wf = !wf;
-    gl.wireframe(wf);
-    if (window.keyboard[GLFW_KEY_L].pressed) {
+
+    if (kb[GLFW_KEY_K].pressed){
+        static bool wf = false;
+        wf = !wf;
+        gl.wireframe(wf);
+    }
+
+    if (window.keyboard[GLFW_KEY_E].pressed) {
         static bool mg = true;
         mg = !mg;
-        window.set_mouse_grab(mg);
+        state.set_playerlook(mg);
+    }
+
+    if (window.keyboard[GLFW_KEY_C].pressed) {
+        state.set_creative(!state.creative);
     }
 
     driver.tick(state, dt);

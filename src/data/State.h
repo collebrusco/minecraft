@@ -14,6 +14,11 @@ struct State : public World {
 
     PerspectiveCamera camera;
 
+    void set_creative(bool c = true);
+    void set_playerlook(bool p = true);
+
+    bool creative;
+    bool player_look;
     entID player;
 };
 
