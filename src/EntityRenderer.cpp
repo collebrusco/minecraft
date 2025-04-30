@@ -8,6 +8,7 @@ ElementBuffer EntityRenderer::ibo;
 Shader EntityRenderer::entity_shader;
 Texture EntityRenderer::texture; 
 SteveModel EntityRenderer::steve;
+CreeperModel EntityRenderer::creeper;
 
 void EntityRenderer::init(){
    const Vt_pun cube_verts[] = {
@@ -62,7 +63,7 @@ void EntityRenderer::init(){
        20, 21, 22, 20, 22, 23};
    entity_shader = Shader::from_source("entity_vert", "entity_frag");
    // TODO break out into its own thing
-   texture = Texture::from_file("steve_template");
+   texture = Texture::from_file("Creeper_T-Shirt");
    texture.pixelate();
    vao.create_bind();
    vbo.create_bind();
@@ -89,6 +90,7 @@ void EntityRenderer::destroy(){
 
 void EntityRenderer::render(Stopwatch const& timer,glm::vec3 pos, glm::vec3 rotation, glm::vec3 scale){
    // auto modelMats = getSteveModelMatrices(timer.read());
+   //Model modelMats = creeper.get();
     Model modelMats = steve.get();
     steve.setT(timer.read());
     glFrontFace(GL_CCW);

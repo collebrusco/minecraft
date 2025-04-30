@@ -3,10 +3,11 @@
 Model SteveModel::get() const{
     Model parts;
 
-    glm::vec3 headSize(0.4f, 0.4f, 0.4f);
-    glm::vec3 bodySize(0.5f, 0.66f, 0.25f);
-    glm::vec3 armSize(0.2f, 0.7f, 0.25f);
-    glm::vec3 legSize(0.25f, 0.7f, 0.25f);
+    glm::vec3 headSize(0.5f, 0.5f, 0.5f); // 8 * 1/16 etc. 
+    glm::vec3 bodySize(0.5f, 0.75f, 0.25f);
+    glm::vec3 armSize(0.25f, 0.75f, 0.25f);
+    glm::vec3 legSize(0.25f, 0.75f, 0.25f);
+    
 
     float maxAngle = glm::pi<float>() / 4.0f;
     float leftArmAngle  =  std::sin(t) * maxAngle;
@@ -141,3 +142,36 @@ Model SteveModel::get() const{
 
 }
 
+Model CreeperModel::get() const{
+    Model parts;
+    // Head
+    ModelPart head;
+    head.mat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.85f, 0.0f));
+    head.mat = glm::scale(head.mat, glm::vec3(0.4f, 0.4f, 0.4f));
+    // Set head UVs here
+    parts.push_back(head);
+
+    // Body
+    ModelPart body;
+    body.mat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.4f, 0.0f));
+    body.mat = glm::scale(body.mat, glm::vec3(0.4f, 0.6f, 0.2f));
+    // Set body UVs here
+    parts.push_back(body);
+
+    // Legs
+    float legY = -0.3f;
+    float legX = 0.15f;
+    float legZ = 0.1f;
+    for (int i = 0; i < 4; ++i)
+    {
+        ModelPart leg;
+        float x = (i % 2 == 0) ? -legX : legX;
+        float z = (i / 2 == 0) ? -legZ : legZ;
+        leg.mat = glm::translate(glm::mat4(1.0f), glm::vec3(x, legY, z));
+        leg.mat = glm::scale(leg.mat, glm::vec3(0.2f, 0.3f, 0.2f));
+        // Set leg UVs here
+        parts.push_back(leg);
+    }
+
+    return parts;
+}

@@ -35,4 +35,15 @@ private:
     float t;
 };
 
+struct CreeperModel : public EntityModel {
+    inline float getT() const {return t;}
+    inline void setT(float nt) {t = nt;}
+
+    void setSkin(const steve_skin_t skin);
+
+    virtual Model get() const override final; /** final meaning no other class will inherit and override this */
+private:
+    float t;    
+};
+
 #endif /* ENTITY_MODEL_H */

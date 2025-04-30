@@ -20,6 +20,7 @@ struct EntityRenderer{
     static Texture texture;
 
     static SteveModel steve;
+    static CreeperModel creeper; //aww man
     static Shader entity_shader;
     static void sync(Camera& cam);
 };
