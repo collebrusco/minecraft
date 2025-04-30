@@ -53,7 +53,7 @@ void PlayerActor::take_turn(const entID self, State& state) {
     move *= speed;
     if (window.keyboard[GLFW_KEY_SPACE].pressed) {
         if (state.getComp<c_Cylinder>(self).grounded(state, self))
-            state.getComp<c_Physics>(self).velo.y = 7.5f;
+            state.getComp<c_Physics>(self).velo.y = 9.f;
     }
     // if (window.keyboard[GLFW_KEY_LEFT_SHIFT].down) {
     //     move -= (V3_UP * speed);        

@@ -41,7 +41,7 @@ pos_t cpos_to_pos(cpos_t const& cpos, pos_t const& offset = pos_t{0.,0.,0.});
 bool bpos_is_local(bpos_t const& bpos);
 bpos_t bpos_to_local(bpos_t const& global);
 
-#define GRAVITY (21.f /* m/s/s */)
+#define GRAVITY (32.f /* m/s/s */)
 
 typedef enum {
     TOP     = 0,

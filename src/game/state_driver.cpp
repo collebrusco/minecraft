@@ -8,40 +8,38 @@ LOG_MODULE(sdriver);
 void Physics::execute(State& state, const float dt) {
     State::Archetype<c_Transform, c_Physics> a;
     for (entID e : state.view(a)) {
-        {
-            auto& phys = a.get<c_Physics>();
-            phys.velo.y -= (GRAVITY * dt);
-            phys.ofs += (phys.velo);
-        }
-        {
-            const vec_t ofs = a.get<c_Physics>().ofs * dt;
-            pos_t newpos = a.get<c_Transform>().pos + ofs;
+        auto& phys = a.get<c_Physics>();
+        const vec_t A = vec_t(0.f, -GRAVITY, 0.f);
+        const vec_t V = phys.ofs + phys.velo;
+        phys.ofs = vec_t(0.f);
+        phys.velo += (A * dt);
 
-            c_Cylinder* cy = state.tryGetComp<c_Cylinder>(e);
-            if (cy && state.cyl_collide(newpos, cy->rad, cy->height, cy->pivot)) {
-                const pos_t oldpos = a.get<c_Transform>().pos;
-                newpos = oldpos;
+        const vec_t move = (V * dt) + (0.5f * A * dt * dt);
+        pos_t newpos = a.get<c_Transform>().pos + move;
 
-                newpos.x += ofs.x;
-                if (state.cyl_collide(newpos, cy->rad, cy->height, cy->pivot)) {
-                    newpos.x = oldpos.x;
-                    a.get<c_Physics>().velo.x = 0.f;
-                }
-                newpos.z += ofs.z;
-                if (state.cyl_collide(newpos, cy->rad, cy->height, cy->pivot)) {
-                    newpos.z = oldpos.z;
-                    a.get<c_Physics>().velo.z = 0.f;
-                }
-                newpos.y += ofs.y;
-                if (state.cyl_collide(newpos, cy->rad, cy->height, cy->pivot)) {
-                    newpos.y = oldpos.y;
-                    a.get<c_Physics>().velo.y = 0.f;
-                }
+        c_Cylinder* cy = state.tryGetComp<c_Cylinder>(e);
+        if (cy && state.cyl_collide(newpos, cy->rad, cy->height, cy->pivot)) {
+            const pos_t oldpos = a.get<c_Transform>().pos;
+            newpos = oldpos;
+
+            newpos.x += move.x;
+            if (state.cyl_collide(newpos, cy->rad, cy->height, cy->pivot)) {
+                newpos.x = oldpos.x;
+                a.get<c_Physics>().velo.x = 0.f;
             }
-
-            a.get<c_Transform>().pos = newpos;
-            a.get<c_Physics>().ofs = vec_t(0.f);
+            newpos.z += move.z;
+            if (state.cyl_collide(newpos, cy->rad, cy->height, cy->pivot)) {
+                newpos.z = oldpos.z;
+                a.get<c_Physics>().velo.z = 0.f;
+            }
+            newpos.y += move.y;
+            if (state.cyl_collide(newpos, cy->rad, cy->height, cy->pivot)) {
+                newpos.y = oldpos.y;
+                a.get<c_Physics>().velo.y = 0.f;
+            }
         }
+
+        a.get<c_Transform>().pos = newpos;
     }
 }
 
