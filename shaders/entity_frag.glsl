@@ -8,7 +8,8 @@ uniform sampler2D uTex;
 
 
 void main(){
-    outColor = texture(uTex, iUV);
+    vec2 UV = iUV; UV.y = 1. - UV.y;
+    outColor = texture(uTex, UV);
     //outColor = vec4(iUV, 0., 1.);
     //vec3 c = iNorm;
     //if (c.r < -0.1) {
