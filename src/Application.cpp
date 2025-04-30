@@ -2,6 +2,7 @@
 #include <flgl/logger.h>
 #include "render/OutlineRenderer.h"
 #include "render/BasicRenderer.h"
+#include "game/components.h"
 using namespace glm;
 LOG_MODULE(mc);
 
@@ -30,104 +31,23 @@ void Application::user_create() {
 
     WorldAxesRenderer::init();
 
-    state.camera.enable_look();
-    state.camera.getPos() = vec3{14.f, 16.f, 14.f};
-    state.camera.getFar() = 700.f;
-    state.camera.getNear() = 0.01f;
-    state.camera.update();
+    driver.init(state);
 }
 
 void Application::user_update(float dt, Keyboard const& kb, Mouse const& mouse) { (void)kb; (void)mouse;
-    static bool wf = false;
     dbui.tall.start();
     if (kb[GLFW_KEY_ESCAPE].down) this->close();
+    static bool wf = false;
     if (kb[GLFW_KEY_K].pressed) wf = !wf;
     gl.wireframe(wf);
-
-    vec3 move = vec3(0.);
-    vec3 fwd = state.camera.readLook(); fwd.y = 0;
-    vec3 rht = cross(state.camera.readLook(), state.camera.readUp());
-    float speed = 4.;
-    if (kb[GLFW_KEY_PERIOD].down) {
-        speed *= 5.;
-    }
-    if (kb[GLFW_KEY_COMMA].down) {
-        speed *= 5.;
-    }
-    if (kb[GLFW_KEY_W].down) {
-        move += fwd;
-    }
-    if (kb[GLFW_KEY_A].down) {
-        move -= rht;
-    }
-    if (kb[GLFW_KEY_S].down) {
-        move -= fwd;
-    }
-    if (kb[GLFW_KEY_D].down) {
-        move += rht;
-    }
-    if (kb[GLFW_KEY_L].pressed) {
+    if (window.keyboard[GLFW_KEY_L].pressed) {
         static bool mg = true;
         mg = !mg;
         window.set_mouse_grab(mg);
     }
-    if (length(move) > 0.) {
-        move = normalize(move);
-    }
-    move *= speed * dt;
-    if (kb[GLFW_KEY_SPACE].down) {
-        move += (V3_UP * speed * dt);
-    }
-    if (kb[GLFW_KEY_LEFT_SHIFT].down) {
-        move -= (V3_UP * speed * dt);        
-    }
 
+    driver.tick(state, dt);
 
-    pos_t oldpos = state.camera.readPos();
-    pos_t newpos = oldpos + move;
-
-    if (!state.cyl_collide(newpos)) {
-        state.camera.getPos() = newpos;
-    } else {
-        pos_t attempt = oldpos;
-
-        attempt.x += move.x;
-        if (!state.cyl_collide(attempt)) {
-            state.camera.getPos() = attempt;
-        }
-
-        attempt = state.camera.readPos();
-        attempt.z += move.z;
-        if (!state.cyl_collide(attempt)) {
-            state.camera.getPos() = attempt;
-        }
-
-        attempt = state.camera.readPos();
-        attempt.y += move.y;
-        if (!state.cyl_collide(attempt)) {
-            state.camera.getPos() = attempt;
-        }
-    }
-
-
-    cpos_t cpos = pos_to_cpos(state.camera.readPos());
-    if (cpos != state.center()) {
-        state.shift_to(cpos);
-    }
-
-    cast = state.raycast(Ray(state.camera.readPos(), state.camera.readLook()));
-
-    if (mouse.left().pressed && cast.hit()) {
-        Block* b = state.blockAt(cast.bpos);
-        *b = Block::null();
-    }
-
-    if (mouse.right().pressed && cast.hit()) {
-        Block* place = state.blockAt(cast.bpos + IDIRECTIONS[cast.face]);
-        place->type = &Blocks::stone;
-    }
-    
-    state.camera.update();
 }
 
 void Application::user_render() {
@@ -151,6 +71,7 @@ void Application::user_render() {
         dbui.tren.stop();
 
 
+    World::RaycastResult const& cast = state.getComp<c_LineOfSight>(state.player).cast;
     if (cast.hit()) {
         OutlineRenderer::sync(state.camera);
         OutlineRenderer::draw(cast.bpos);
@@ -166,6 +87,7 @@ void Application::user_render() {
 }
 
 void Application::user_destroy() {
+    driver.destroy();
     dbui.destroy();
     TextRenderer::destroy_text_rendering();
     ChunkRenderer::destroy_chunk_rendering();

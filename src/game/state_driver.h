@@ -9,23 +9,31 @@
 #include "data/State.h"
 
 struct Physics {
-    static void execute(State& state);
+    static void execute(State& state, const float dt);
 };
 
 struct ActionSystem {
-    void execute(State& state, const float dt);
+    void execute(State& state);
+};
+
+struct CameraControlSystem {
+    CameraControlSystem() : target(0xFFFFFFFFFFFFFFFF) {}
+    void execute(State& state);
+    void set_target(entID e);
+    entID get_target() const;
 private:
-    
+    entID target;
 };
 
 struct StateDriver {
-    void init();
+    void init(State& state);
     void destroy();
 
     void tick(State& state, const float dt);
 
 private:
-    
+    ActionSystem action;
+    CameraControlSystem camcontrol;
 };
 
 

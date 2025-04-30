@@ -12,6 +12,7 @@
 #include "data/Chunk.h"
 #include "data/World.h"
 #include "data/State.h"
+#include "game/state_driver.h"
 #include "render/ChunkRenderer.h"
 #include "render/WorldRenderer.h"
 #include "util/DebugUI.h"
@@ -27,10 +28,9 @@ struct Application : public Driver {
     BasicWorldGen wgen;
 
     State state;
-    World::RaycastResult cast;
+    StateDriver driver;
 
     WorldRenderer wrenderer;
-
 
     DebugUI dbui;
 

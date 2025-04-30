@@ -12,11 +12,9 @@ struct State : public World {
     State(WorldGenerator& wgen);
     virtual ~State() = default;
 
-    MousePerspectiveCamera camera;
+    PerspectiveCamera camera;
 
     entID player;
-
-    State::RaycastResult cast;
 };
 
 #endif /* STATE_H */
