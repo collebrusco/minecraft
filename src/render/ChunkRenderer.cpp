@@ -51,7 +51,7 @@ void ChunkRenderer::init_chunk_rendering() {
     };
 
     vao.create_bind();
-    
+
     vbo.create_bind();
     vbo.buffer_data(4, verts);
     vao.attach(vbo);

@@ -93,5 +93,4 @@ static inline glm::ivec3 index_mod(glm::ivec3 i, int m) {
     return glm::ivec3{(x<0)?x+m:x, (y<0)?y+m:y, (z<0)?z+m:z};
 }
 
-
 #endif /* STANDARD_H */

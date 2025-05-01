@@ -2,6 +2,7 @@
 #include <flgl/logger.h>
 #include "render/OutlineRenderer.h"
 #include "render/BasicRenderer.h"
+#include "render/EntityRenderer.h"
 #include "game/components.h"
 using namespace glm;
 LOG_MODULE(mc);
@@ -30,6 +31,8 @@ void Application::user_create() {
     WorldPointRenderer::init();
 
     WorldAxesRenderer::init();
+
+    EntityRenderer::init();
 
     driver.init(state);
 }
@@ -102,5 +105,6 @@ void Application::user_destroy() {
     PointRenderer::destroy();
     WorldPointRenderer::destroy();
     WorldAxesRenderer::destroy();
+    EntityRenderer::destroy();
     wrenderer.destroy();
 }
