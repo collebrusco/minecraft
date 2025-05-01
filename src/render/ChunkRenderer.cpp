@@ -100,15 +100,15 @@ bool ChunkRenderer::update(Chunk const& chunk, World const& world) {
                 const bpos_t local{x, y, z};
                 assert(bpos_is_local(local));
 
-                const Block* b = chunk.blockAt(local);
-                if (!b || b->empty()) continue;
+                blockID b = chunk.blockAt(local);
+                if (!b) continue;
 
-                for (int i = 0; i <= ORIENTATION_LAST; ++i) {
+                for (int i = 0; i < ORIENTATION_LAST; ++i) {
                     const orientation_e face = static_cast<orientation_e>(i);
                     const bpos_t dir = IDIRECTIONS[i];
                     const bpos_t near_local = local + dir;
 
-                    const Block* test = nullptr;
+                    blockID test = 0;
 
                     if (bpos_is_local(near_local)) {
                         test = chunk.blockAt(near_local);
@@ -117,8 +117,8 @@ bool ChunkRenderer::update(Chunk const& chunk, World const& world) {
                         test = world.read_blockAt(world_pos);
                     }
 
-                    if (!test || test->empty()) {
-                        emit_face(face, b->type->faces[i].face, local.x, local.y, local.z);
+                    if (!test) {
+                        emit_face(face, BlockType::get(b)->faces[i].face, local.x, local.y, local.z);
                     }
                 }
             }
@@ -162,7 +162,7 @@ void ChunkRenderer::emit_cube(int sx, int sy, int sz) {
     instance_data.push_back(instance_u{instance_u::instance_data{x, y, z, WEST, 0}}.val);
 }
 
-void ChunkRenderer::emit_face(orientation_e o, face_e face, int sx, int sy, int sz) {
+void ChunkRenderer::emit_face(orientation_e o, Faces face, int sx, int sy, int sz) {
     uint32_t x = sx, y = sy, z = sz;
     instance_data.push_back(instance_u{instance_u::instance_data{x, z, y, o, (uint32_t)face}}.val);
 }

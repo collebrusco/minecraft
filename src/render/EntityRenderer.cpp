@@ -102,7 +102,7 @@ void EntityRenderer::render(EntityModel& emodel, glm::vec3 pos, glm::vec3 rotati
 
         glm::vec2 uvsMin[6];
         glm::vec2 uvsMax[6];
-        for (int i = 0; i <= ORIENTATION_LAST; i++)
+        for (int i = 0; i < ORIENTATION_LAST; i++)
         {
             uvsMin[i] = m.uvs[i].mi; // Get the min corner
             uvsMax[i] = m.uvs[i].mx; // Get the max corner

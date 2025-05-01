@@ -2,13 +2,27 @@
 LOG_MODULE(wgen);
 using namespace glm;
 
-void BasicWorldGen::gen_chunk(cpos_t cpos, Chunk *target, World& world) const {
+void WorldGenerator::gen_chunk(cpos_t cpos, Chunk *target, World &world) const {
+    Chunk* c;
+    c = world.chunkAt(cpos+IV2_NORTH);
+    if (c) c->mark();
+    c = world.chunkAt(cpos+IV2_SOUTH);
+    if (c) c->mark();
+    c = world.chunkAt(cpos+IV2_EAST);
+    if (c) c->mark();
+    c = world.chunkAt(cpos+IV2_WEST);
+    if (c) c->mark();
+    this->abs_gen_chunk(cpos, target, world);
+}
+
+void BasicWorldGen::abs_gen_chunk(cpos_t cpos, Chunk *target, World &world) const
+{
     bpos_t pos = cpos_to_bpos(cpos);
     for (int i = 0; i < CHUNK_SIZE; i++) {
         for (int j = 0; j < CHUNK_SIZE; j++) {
             int x = pos.x + i; int z = pos.z + j;
             int y = glm::floor(noise.value_octave(x, z, 6) * 6.);
-            world.blockAtLocalNoFlag(bpos_t{i, y, j}, target)->type = &Blocks::grass;
+            *(world.blockAtLocalNoFlag(bpos_t{i, y, j}, target)) = *Blocks::GRASS;
         }
     }
 }
@@ -70,7 +84,7 @@ void PerlinWorldGen::init() {
     terrain_lowres.resize(terrain_nx * terrain_nx);
     cave_field.resize(cave_nx * cave_ny * cave_nz);
 }
-void PerlinWorldGen::gen_chunk(cpos_t cpos, Chunk* target, World& world) const {
+void PerlinWorldGen::abs_gen_chunk(cpos_t cpos, Chunk* target, World& world) const {
     constexpr int CH = CHUNK_SIZE;
     constexpr int HMAX = MAX_HEIGHT;
 
@@ -162,16 +176,16 @@ void PerlinWorldGen::gen_chunk(cpos_t cpos, Chunk* target, World& world) const {
                     continue;
 
                 bpos_t pos = {i, j, k};
-                Block* blk = world.blockAtLocalNoFlag(pos, target);
+                blockID* blk = world.blockAtLocalNoFlag(pos, target);
 
                 if (j > surface_h)
                     continue;
                 else if (j == surface_h)
-                    blk->type = &Blocks::grass;
+                    *blk = *Blocks::GRASS;
                 else if (j > surface_h - 4)
-                    blk->type = &Blocks::dirt;
+                    *blk = *Blocks::DIRT;
                 else
-                    blk->type = &Blocks::stone;
+                    *blk = *Blocks::STONE;
             }
         }
     }

@@ -24,21 +24,23 @@ void WorldRenderer::destroy() {
     }
 }
 
-void WorldRenderer::update(World const& world) {
+void WorldRenderer::update(World const& world, size_t batch) {
     Chunk*const* buf = world.renderdata();
     for (ITER_WORLD_BUF(i)) {
         if (buf[i] && buf[i]->is_marked()) {
             renderers[i].update(*(buf[i]), world);
+            if (!(--batch)) return;
         }
     }
 }
 
-void WorldRenderer::buffer(World const& world) {
+void WorldRenderer::buffer(World const& world, size_t batch) {
     Chunk*const* buf = world.renderdata();
     for (ITER_WORLD_BUF(i)) {
         if (buf[i] && buf[i]->is_marked()) {
             buf[i]->mark(false);
             renderers[i].buffer();
+            if (!(--batch)) return;
         }
     }
 }

@@ -1,4 +1,5 @@
 #include "World.h"
+#include "game/WorldGen.h"
 using namespace glm;
 LOG_MODULE(world);
 
@@ -71,7 +72,7 @@ Chunk const *World::read_chunkAt(cpos_t pos) const {
     return store.get(pos);
 }
 
-Block *World::blockAt(bpos_t pos) {
+blockID *World::blockAt(bpos_t pos) {
     if (!bpos_is_valid(pos)) return 0;
     Chunk* chunk = this->chunkAt(bpos_to_cpos(pos));
     if (!chunk) return 0;
@@ -92,19 +93,16 @@ void World::mark_adjacent_if_solid(bpos_t world_pos, Chunk* self_chunk) {
 
     bpos_t local = bpos_to_local(world_pos);
 
-    Block* b = neighbor->blockAt(local);
+    blockID* b = neighbor->blockAt(local);
     if (!b) {
         return;
     }
 
-    if (b->empty()) {
-    } else {
-        neighbor->mark();
-    }
+    neighbor->mark();
 }
 
 /** marks chunk and any adjacent if needed */
-Block* World::blockAtLocal(bpos_t lpos, Chunk* chunk) {
+blockID* World::blockAtLocal(bpos_t lpos, Chunk* chunk) {
     if (!bpos_is_local(lpos)) {
         LOG_ERR("non local pos to World::blockAtLocal");
         return 0;
@@ -127,21 +125,21 @@ Block* World::blockAtLocal(bpos_t lpos, Chunk* chunk) {
 
 
 
-Block const *World::read_blockAt(bpos_t pos) const {
+blockID World::read_blockAt(bpos_t pos) const {
     if (!bpos_is_valid(pos)) return 0;
     const Chunk* chunk = this->read_chunkAt(bpos_to_cpos(pos));
     if (!chunk) return 0;
     return chunk->blockAt(bpos_to_local(pos));
 }
 
-Block *World::blockAtNoFlag(bpos_t pos) {
+blockID* World::blockAtNoFlag(bpos_t pos) {
     if (!bpos_is_valid(pos)) return 0;
     Chunk* chunk = store.get(bpos_to_cpos(pos));
     if (!chunk) return 0;
     return chunk->blockAt(bpos_to_local(pos));
 }
 
-Block *World::blockAtLocalNoFlag(bpos_t lpos, Chunk *chunk) {
+blockID* World::blockAtLocalNoFlag(bpos_t lpos, Chunk *chunk) {
     if (!bpos_is_valid(lpos)) return 0;
     return chunk->blockAt(lpos);
 }
@@ -174,8 +172,8 @@ World::RaycastResult World::raycast(Ray const& r, float maxlen) {
     orientation_e hit_face = TOP;
 
     while (dist_traveled <= maxlen) {
-        const Block* block = read_blockAt(blockPos);
-        if (block && !block->empty()) {
+        blockID block = read_blockAt(blockPos);
+        if (block) {
             glm::vec3 collision_pos = origin + dir * dist_traveled;
             return {block, blockPos, collision_pos, hit_face, dist_traveled};
         }
@@ -207,14 +205,9 @@ World::RaycastResult World::raycast(Ray const& r, float maxlen) {
         }
     }
 
-    return {nullptr, blockPos, origin + dir * maxlen, TOP, maxlen};
+    return {0, blockPos, origin + dir * maxlen, TOP, maxlen};
 }
 
-
-static inline bool solid_block(const World* w, int x, int y, int z) {
-    const Block* b = w->read_blockAt({x, y, z});
-    return b && !b->empty();
-}
 
 bool World::disc_collide(pos_t pos, float rad) const {
     const int bx = static_cast<int>(std::floor(pos.x));
@@ -227,17 +220,17 @@ bool World::disc_collide(pos_t pos, float rad) const {
     const float half = 0.5f;
     const float rr   = rad * rad;
 
-    const bool center      = !read_blockAt({bx,     by, bz})->empty();
+    const bool center      = read_blockAt({bx,     by, bz});
 
-    const bool west        = (lx < -(half - rad)) && !read_blockAt({bx - 1, by, bz})->empty();
-    const bool east        = (lx >  (half - rad)) && !read_blockAt({bx + 1, by, bz})->empty();
-    const bool north       = (lz >  (half - rad)) && !read_blockAt({bx,     by, bz + 1})->empty();
-    const bool south       = (lz < -(half - rad)) && !read_blockAt({bx,     by, bz - 1})->empty();
+    const bool west        = (lx < -(half - rad)) && read_blockAt({bx - 1, by, bz});
+    const bool east        = (lx >  (half - rad)) && read_blockAt({bx + 1, by, bz});
+    const bool north       = (lz >  (half - rad)) && read_blockAt({bx,     by, bz + 1});
+    const bool south       = (lz < -(half - rad)) && read_blockAt({bx,     by, bz - 1});
 
-    const bool north_west  = ( (lx + half)*(lx + half) + (lz - half)*(lz - half) < rr ) && !read_blockAt({bx - 1, by, bz + 1})->empty();
-    const bool north_east  = ( (lx - half)*(lx - half) + (lz - half)*(lz - half) < rr ) && !read_blockAt({bx + 1, by, bz + 1})->empty();
-    const bool south_west  = ( (lx + half)*(lx + half) + (lz + half)*(lz + half) < rr ) && !read_blockAt({bx - 1, by, bz - 1})->empty();
-    const bool south_east  = ( (lx - half)*(lx - half) + (lz + half)*(lz + half) < rr ) && !read_blockAt({bx + 1, by, bz - 1})->empty();
+    const bool north_west  = ( (lx + half)*(lx + half) + (lz - half)*(lz - half) < rr ) && read_blockAt({bx - 1, by, bz + 1});
+    const bool north_east  = ( (lx - half)*(lx - half) + (lz - half)*(lz - half) < rr ) && read_blockAt({bx + 1, by, bz + 1});
+    const bool south_west  = ( (lx + half)*(lx + half) + (lz + half)*(lz + half) < rr ) && read_blockAt({bx - 1, by, bz - 1});
+    const bool south_east  = ( (lx - half)*(lx - half) + (lz + half)*(lz + half) < rr ) && read_blockAt({bx + 1, by, bz - 1});
 
     return center || west || east || north || south || north_west || north_east || south_west || south_east;
 }

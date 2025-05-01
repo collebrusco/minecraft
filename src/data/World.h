@@ -10,18 +10,7 @@
 #include "standard.h"
 #include "Chunk.h"
 
-typedef size_t seed_t;
-
-struct World;
-
-struct WorldGenerator {
-    WorldGenerator(seed_t s = 0x4200FEED) : _seed(s) {}
-    virtual ~WorldGenerator() = default;
-    virtual void gen_chunk(cpos_t cpos, Chunk* target, World& world) const = 0;
-    seed_t seed() const {return _seed;}
-private:
-    seed_t _seed;
-};
+struct WorldGenerator;
 
 namespace std {
     template<>
@@ -41,15 +30,15 @@ struct World : public ECS<> {
 
     Chunk* chunkAt(cpos_t pos);
     Chunk const* read_chunkAt(cpos_t pos) const;
-    Block* blockAt(bpos_t pos);
-    Block* blockAtLocal(bpos_t lpos, Chunk* chunk);
-    Block const* read_blockAt(bpos_t pos) const;
+    blockID* blockAt(bpos_t pos);
+    blockID* blockAtLocal(bpos_t lpos, Chunk* chunk);
+    blockID read_blockAt(bpos_t pos) const;
 
-    Block* blockAtNoFlag(bpos_t pos);
-    Block* blockAtLocalNoFlag(bpos_t lpos, Chunk* chunk);
+    blockID* blockAtNoFlag(bpos_t pos);
+    blockID* blockAtLocalNoFlag(bpos_t lpos, Chunk* chunk);
 
     struct RaycastResult {
-        const Block* block;
+        blockID block;
         bpos_t bpos;
         pos_t pos;
         orientation_e face;

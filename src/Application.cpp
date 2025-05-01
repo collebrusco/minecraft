@@ -9,7 +9,7 @@ LOG_MODULE(mc);
 
 
 Application::Application() : state(wgen) {
-    const float kb = (static_cast<float>(sizeof(Block)) * CHUNK_SIZE_F * CHUNK_SIZE_F * MAX_HEIGHT_F) / 1024.f;
+    const float kb = (static_cast<float>(sizeof(blockID)) * CHUNK_SIZE_F * CHUNK_SIZE_F * MAX_HEIGHT_F) / 1024.f;
     const float mb = kb / 1024.f;
     LOG_INF("minecraft init");
     LOG_INF("chunk size: %.0f KB (%.2f MB)", kb, mb);

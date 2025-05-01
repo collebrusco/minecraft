@@ -15,8 +15,8 @@ struct WorldRenderer {
     void init();
     void destroy();
 
-    void update(World const& world);
-    void buffer(World const& world);
+    void update(World const& world, size_t batch = 3);
+    void buffer(World const& world, size_t batch = 3);
     void sync(Camera const& cam);
 
     void render() const;

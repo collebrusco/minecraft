@@ -68,13 +68,13 @@ void PlayerActor::take_turn(const entID self, State& state) {
     state.addOrGetComp<c_Physics>(self).ofs = move;
 
     if (window.mouse.left().pressed && los.cast.hit()) {
-        Block* b = state.blockAt(los.cast.bpos);
-        *b = Block::null();
+        blockID* b = state.blockAt(los.cast.bpos);
+        *b = *Blocks::AIR;
     }
 
     if (window.mouse.right().pressed && los.cast.hit()) {
-        Block* place = state.blockAt(los.cast.bpos + IDIRECTIONS[los.cast.face]);
-        place->type = &Blocks::stone;
+        blockID* place = state.blockAt(los.cast.bpos + IDIRECTIONS[los.cast.face]);
+        *place = *Blocks::STONE;
     }
     
 }

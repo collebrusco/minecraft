@@ -12,7 +12,7 @@
 #include <flgl/allocators.h>
 #include <flgl/ecs.h>
 
-typedef size_t blockID;
+typedef uint8_t blockID;
 
 #define BLOCK_PIX (16)
 #define BLOCK_PIX_F (static_cast<float>(BLOCK_PIX))
@@ -52,9 +52,9 @@ typedef enum {
     NORTH   = 2,
     SOUTH   = 3,
     EAST    = 4,
-    WEST    = 5
+    WEST    = 5,
+    ORIENTATION_LAST,
 } orientation_e;
-#define ORIENTATION_LAST (WEST)
 
 extern const glm::vec3 DIRECTIONS[6];
 extern const glm::ivec3 IDIRECTIONS[6];
@@ -77,6 +77,10 @@ extern const glm::ivec3 IDIRECTIONS[6];
 #define V2_SOUTH   (glm::vec2{ 0.f, -1.f})
 #define V2_EAST    (glm::vec2{ 1.f,  0.f})
 #define V2_WEST    (glm::vec2{-1.f,  0.f})
+#define IV2_NORTH  (glm::ivec2{ 0,  1})
+#define IV2_SOUTH  (glm::ivec2{ 0, -1})
+#define IV2_EAST   (glm::ivec2{ 1,  0})
+#define IV2_WEST   (glm::ivec2{-1,  0})
 
 static inline int index_mod(int i, int m) {
     const int r = i % m; return (r < 0) ? r + m : r;

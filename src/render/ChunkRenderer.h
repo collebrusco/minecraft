@@ -37,7 +37,7 @@ struct ChunkRenderer {
     void render() const;
 
     void emit_cube(int x, int y, int z);
-    void emit_face(orientation_e o, face_e face, int x, int y, int z);
+    void emit_face(orientation_e o, Faces face, int x, int y, int z);
 };
 
 

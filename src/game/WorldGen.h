@@ -9,10 +9,23 @@
 #include "data/World.h"
 #include "util/Noise.h"
 
+typedef size_t seed_t;
+
+struct World;
+
+struct WorldGenerator {
+    WorldGenerator(seed_t s = 0x4200FEED) : _seed(s) {}
+    virtual ~WorldGenerator() = default;
+    void gen_chunk(cpos_t cpos, Chunk* target, World& world) const;
+    seed_t seed() const {return _seed;}
+private:
+    virtual void abs_gen_chunk(cpos_t cpos, Chunk* target, World& world) const = 0;
+    seed_t _seed;
+};
 
 struct BasicWorldGen : public WorldGenerator {
     Noise noise;
-    virtual void gen_chunk(cpos_t, Chunk* target, World& world) const override final;
+    virtual void abs_gen_chunk(cpos_t, Chunk* target, World& world) const override final;
 };
 
 
@@ -45,7 +58,7 @@ struct PerlinWorldGen : public WorldGenerator {
     Perlin2 perlin2;
     Perlin3 perlin3;
     void init();    
-    virtual void gen_chunk(cpos_t pos, Chunk* target, World& world) const override final;
+    virtual void abs_gen_chunk(cpos_t pos, Chunk* target, World& world) const override final;
 private:
     int terrain_nx = 0;
     int cave_nx = 0, cave_ny = 0, cave_nz = 0;

@@ -12,7 +12,7 @@ struct ModelPart {
     struct {
         glm::vec2 mi;
         glm::vec2 mx;
-    } uvs[ORIENTATION_LAST + 1];
+    } uvs[ORIENTATION_LAST];
 };
 
 typedef std::vector<ModelPart> Model; /** placehold with a typedef, can become a struct later if needed */
