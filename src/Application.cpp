@@ -57,7 +57,11 @@ void Application::user_update(float dt, Keyboard const& kb, Mouse const& mouse) 
         state.set_creative(!state.creative);
     }
 
-    driver.tick(state, dt);
+    driver.tickA(state, dt);
+    dbui.teng.start();
+    driver.tickB(state, dt);
+    dbui.teng.stop();
+    driver.tickC(state, dt);
 
 }
 
@@ -80,14 +84,6 @@ void Application::user_render() {
     wrenderer.render();
         glFinish();
         dbui.tren.stop();
-
-    /** TODO remove this temp entity demo */
-    SteveModel steve; steve.setT(launch_timer().read());
-    CreeperModel creep; creep.setT(launch_timer().read());
-
-    EntityRenderer::sync(state.camera);
-    EntityRenderer::render(steve, {12, 8, 14});
-    EntityRenderer::render(creep, {14, 8, 14});
 
 
     World::RaycastResult const& cast = state.getComp<c_LineOfSight>(state.player).cast;

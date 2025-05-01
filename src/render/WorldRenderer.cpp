@@ -27,7 +27,8 @@ void WorldRenderer::destroy() {
 void WorldRenderer::update(World const& world, size_t batch) {
     Chunk*const* buf = world.renderdata();
     for (ITER_WORLD_BUF(i)) {
-        if (buf[i] && buf[i]->is_marked()) {
+        if (buf[i] && buf[i]->get_state() == Chunk::DIRTY) {
+            buf[i]->clean_cpu();
             renderers[i].update(*(buf[i]), world);
             if (!(--batch)) return;
         }
@@ -37,8 +38,8 @@ void WorldRenderer::update(World const& world, size_t batch) {
 void WorldRenderer::buffer(World const& world, size_t batch) {
     Chunk*const* buf = world.renderdata();
     for (ITER_WORLD_BUF(i)) {
-        if (buf[i] && buf[i]->is_marked()) {
-            buf[i]->mark(false);
+        if (buf[i] && buf[i]->get_state() == Chunk::NEED_BUFFER) {
+            buf[i]->clean_gpu();
             renderers[i].buffer();
             if (!(--batch)) return;
         }

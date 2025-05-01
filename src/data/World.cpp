@@ -53,8 +53,8 @@ World::World(WorldGenerator& g) : generator(g), _center(0) {
         for (ITER_WORLD_BUFXY(j)) {
             cpos_t pos(i - (RENDER_DISTANCE_R), j - (RENDER_DISTANCE_R));
             desired_chunks[cpos_to_idx(pos)] = pos;
-            chunks[cpos_to_idx(pos)] = store.gen(pos, *this);
-            chunks[cpos_to_idx(pos)]->mark();
+            // chunks[cpos_to_idx(pos)] = store.gen(pos, *this);
+            // chunks[cpos_to_idx(pos)]->mark();
         }
     }
 }
@@ -110,14 +110,13 @@ blockID* World::blockAtLocal(bpos_t lpos, Chunk* chunk) {
     if (!bpos_is_valid(lpos)) return 0;
     chunk->mark();
 
-    constexpr int CH = CHUNK_SIZE;
     const bpos_t wpos = cpos_to_bpos(chunk->pos) + lpos;
 
     if (lpos.x == 0)         mark_adjacent_if_solid(wpos + bpos_t{-1, 0, 0}, chunk);
-    else if (lpos.x == CH-1) mark_adjacent_if_solid(wpos + bpos_t{ 1, 0, 0}, chunk);
+    else if (lpos.x == CHUNK_SIZE-1) mark_adjacent_if_solid(wpos + bpos_t{ 1, 0, 0}, chunk);
     
     if (lpos.z == 0)         mark_adjacent_if_solid(wpos + bpos_t{0, 0, -1}, chunk);
-    else if (lpos.z == CH-1) mark_adjacent_if_solid(wpos + bpos_t{0, 0,  1}, chunk);
+    else if (lpos.z == CHUNK_SIZE-1) mark_adjacent_if_solid(wpos + bpos_t{0, 0,  1}, chunk);
 
     return chunk->blockAt(lpos);
 }

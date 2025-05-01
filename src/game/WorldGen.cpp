@@ -12,7 +12,10 @@ void WorldGenerator::gen_chunk(cpos_t cpos, Chunk *target, World &world) const {
     if (c) c->mark();
     c = world.chunkAt(cpos+IV2_WEST);
     if (c) c->mark();
+    Stopwatch timer(Stopwatch::MICROSECONDS);
+    timer.start();
     this->abs_gen_chunk(cpos, target, world);
+    SLOW_LOG_INF(128, "wgen %.0fus", timer.stop());
 }
 
 void BasicWorldGen::abs_gen_chunk(cpos_t cpos, Chunk *target, World &world) const
@@ -87,9 +90,6 @@ void PerlinWorldGen::init() {
 void PerlinWorldGen::abs_gen_chunk(cpos_t cpos, Chunk* target, World& world) const {
     constexpr int CH = CHUNK_SIZE;
     constexpr int HMAX = MAX_HEIGHT;
-
-    static int nch = 0;
-    LOG_INF("chunk %d", nch++);
 
     bpos_t base = cpos_to_bpos(cpos);
     const int terrain_res = params.terrain_resolution;

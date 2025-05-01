@@ -20,7 +20,7 @@ typedef uint8_t blockID;
 #define CHUNK_SIZE_F (static_cast<float>(CHUNK_SIZE))
 #define MAX_HEIGHT (256)
 #define MAX_HEIGHT_F (static_cast<float>(MAX_HEIGHT))
-#define RENDER_DISTANCE_R (8)
+#define RENDER_DISTANCE_R (12)
 #define RENDER_DISTANCE_MIDPT RENDER_DISTANCE_R
 #define RENDER_DISTANCE (RENDER_DISTANCE_R * 2)
 #define RENDER_DISTANCE_F (static_cast<float>(RENDER_DISTANCE))

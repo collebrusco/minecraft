@@ -13,11 +13,22 @@ struct Chunk {
     Chunk(cpos_t pos);
     cpos_t pos;
     blockID blockAt(bpos_t local) const;
-    inline void mark(bool m = true) {flag = m;}
-    inline bool is_marked() const {return flag;}
     inline glm::mat4 const& get_model() const {return model;}
+
+    enum State {
+        CLEAN = 0,
+        DIRTY,
+        NEED_BUFFER,
+    };
+    State get_state() const {return state;}
+
+    inline void mark() {state = DIRTY;}
+    inline void clean_cpu() {if (state == DIRTY) state = NEED_BUFFER;}
+    inline void clean_gpu() {if (state == NEED_BUFFER) state = CLEAN;}
+
 private:
 friend struct World;
+    State state;
     blockID* blockAt(bpos_t local);
     const glm::mat4 model;
     bool flag;

@@ -56,10 +56,16 @@ void StateDriver::init(State& state) {
 void StateDriver::destroy() {
 }
 
-void StateDriver::tick(State &state, const float dt) {
+void StateDriver::tickA(State &state, const float dt) {
     action.execute(state);
     Physics::execute(state, dt);
+}
+
+void StateDriver::tickB(State &state, const float dt) {
     camcontrol.execute(state);
+}
+
+void StateDriver::tickC(State &state, const float dt) {
     c_LineOfSight::cast_all(state);
 }
 
@@ -86,7 +92,7 @@ void CameraControlSystem::execute(State& state) {
     if (cpos != state.center()) {
         state.shift_to(cpos);
     }
-    state.load_batch(3);
+    state.load_batch(1);
 
     state.camera.update();
 }

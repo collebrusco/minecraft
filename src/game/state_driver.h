@@ -29,7 +29,9 @@ struct StateDriver {
     void init(State& state);
     void destroy();
 
-    void tick(State& state, const float dt);
+    void tickA(State& state, const float dt);
+    void tickB(State& state, const float dt);
+    void tickC(State& state, const float dt);
 
 private:
     ActionSystem action;
