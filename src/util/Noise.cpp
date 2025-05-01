@@ -146,8 +146,9 @@ static glm::vec3 rotate3D(glm::vec3 v, glm::vec3 rot) {
 }
 
 Perlin2::Perlin2(uint64_t s) : Noise(s) {}
-float Perlin2::perlin(glm::vec2 pos, float rotation, glm::vec2 scale) {
-    pos *= scale;
+
+float Perlin2::perlin(glm::vec2 pos, float rotation, glm::vec2 scale) const {
+    pos /= scale;
 
     glm::ivec2 p0 = glm::floor(pos);
     glm::ivec2 p1 = p0 + glm::ivec2(1);
@@ -173,11 +174,14 @@ float Perlin2::perlin(glm::vec2 pos, float rotation, glm::vec2 scale) {
 
     float ix0 = smootherstep(i00, i10, u);
     float ix1 = smootherstep(i01, i11, u);
-    return smootherstep(ix0, ix1, v);
+    return 0.5f * smootherstep(ix0, ix1, v) + 0.5f;
 }
 
-float Perlin3::perlin(glm::vec3 pos, glm::vec3 rotation, glm::vec3 scale) {
-    pos *= scale;
+Perlin3::Perlin3(uint64_t s) : Noise(s) {
+}
+
+float Perlin3::perlin(glm::vec3 pos, glm::vec3 rotation, glm::vec3 scale) const {
+    pos /= scale;
 
     glm::ivec3 p0 = glm::floor(pos);
     glm::ivec3 p1 = p0 + glm::ivec3(1);
@@ -222,7 +226,5 @@ float Perlin3::perlin(glm::vec3 pos, glm::vec3 rotation, glm::vec3 scale) {
     float y0 = smootherstep(x00, x10, v);
     float y1 = smootherstep(x01, x11, v);
 
-    return smootherstep(y0, y1, w);
+    return 0.5f * smootherstep(y0, y1, w) + 0.5f;
 }
-
-

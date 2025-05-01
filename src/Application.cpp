@@ -38,11 +38,11 @@ void Application::user_update(float dt, Keyboard const& kb, Mouse const& mouse) 
     dbui.tall.start();
     if (kb[GLFW_KEY_ESCAPE].down) this->close();
 
+    static bool wf = false;
     if (kb[GLFW_KEY_K].pressed){
-        static bool wf = false;
         wf = !wf;
-        gl.wireframe(wf);
     }
+    gl.wireframe(wf);
 
     if (window.keyboard[GLFW_KEY_E].pressed) {
         static bool mg = true;

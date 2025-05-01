@@ -49,7 +49,7 @@ void StateDriver::init(State& state) {
     state.camera.getNear() = 0.01f;
     state.camera.update();
 
-    state.player = Player::spawn(state, {14.f,16.f,14.f}).id;
+    state.player = Player::spawn(state, {14.f,100.f,14.f}).id;
     camcontrol.set_target(state.player);
 }
 

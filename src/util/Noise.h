@@ -34,14 +34,14 @@ struct Noise {
     glm::vec3 unitVec(int32_t x, int32_t y, int32_t z) const;
 };
 
-struct Perlin2 : public Noise {
-    Perlin2(uint64_t s);
-    float perlin(glm::vec2 pos, float rotation = 0.f, glm::vec2 scale = glm::vec2(1.));
+struct Perlin2 : private Noise {
+    Perlin2(uint64_t s = 0x4200FEED19982005ull);
+    float perlin(glm::vec2 pos, float rotation = 0.f, glm::vec2 scale = glm::vec2(1.)) const;
 };
 
-struct Perlin3 : public Noise {
-    Perlin3(uint64_t s);
-    float perlin(glm::vec3 pos, glm::vec3 rotation = glm::vec3(0.f), glm::vec3 scale = glm::vec3(1.));
+struct Perlin3 : private Noise {
+    Perlin3(uint64_t s = 0x4200FEED19982005ull);
+    float perlin(glm::vec3 pos, glm::vec3 rotation = glm::vec3(0.f), glm::vec3 scale = glm::vec3(1.)) const;
 };
 
 #endif /* NOISE_H */

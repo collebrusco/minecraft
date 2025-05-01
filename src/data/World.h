@@ -12,10 +12,12 @@
 
 typedef size_t seed_t;
 
+struct World;
+
 struct WorldGenerator {
     WorldGenerator(seed_t s = 0x4200FEED) : _seed(s) {}
     virtual ~WorldGenerator() = default;
-    virtual void gen_chunk(cpos_t, Chunk* target) const = 0;
+    virtual void gen_chunk(cpos_t cpos, Chunk* target, World& world) const = 0;
     seed_t seed() const {return _seed;}
 private:
     seed_t _seed;
@@ -40,7 +42,11 @@ struct World : public ECS<> {
     Chunk* chunkAt(cpos_t pos);
     Chunk const* read_chunkAt(cpos_t pos) const;
     Block* blockAt(bpos_t pos);
+    Block* blockAtLocal(bpos_t lpos, Chunk* chunk);
     Block const* read_blockAt(bpos_t pos) const;
+
+    Block* blockAtNoFlag(bpos_t pos);
+    Block* blockAtLocalNoFlag(bpos_t lpos, Chunk* chunk);
 
     struct RaycastResult {
         const Block* block;
@@ -64,6 +70,7 @@ struct World : public ECS<> {
     inline Chunk*const* renderdata() const {return &chunks[0];}
 private:
     static size_t cpos_to_idx(cpos_t cpos);
+    void mark_adjacent_if_solid(bpos_t world_pos, Chunk* self_chunk);
     struct ChunkStore {
         ChunkStore() = default;
         ~ChunkStore();
@@ -73,9 +80,10 @@ private:
         std::unordered_map<cpos_t, Chunk*> map;
         Chunk* get(cpos_t);
         Chunk const* get(cpos_t) const;
-        Chunk* gen(cpos_t, WorldGenerator const& gen);
-        Chunk* get_or_gen(cpos_t, WorldGenerator const& gen);
+        Chunk* gen(cpos_t, World& world);
+        Chunk* get_or_gen(cpos_t, World& world);
     };
+friend struct ChunkStore;
     ChunkStore store;
     WorldGenerator& generator;
     cpos_t _center;

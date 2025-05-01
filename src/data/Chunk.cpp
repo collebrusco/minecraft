@@ -16,9 +16,11 @@ Block const *Chunk::BlockStore::read(bpos_t local) const {
 }
 
 size_t Chunk::BlockStore::flatten_idx(bpos_t local) {
-    return local.y * CHUNK_SIZE * CHUNK_SIZE +
-           local.z * CHUNK_SIZE +
-           local.x;
+    size_t r = (local.y * CHUNK_SIZE * CHUNK_SIZE) + (local.z * CHUNK_SIZE) + local.x;
+    if (!(r < n())) {
+        LOG_ERR("trying to access block store with non-local %d,%d,%d", local.x, local.y, local.z);
+    }
+    return r;
 }
 
 Block::Block(BlockType const *const typ) : type(typ) {

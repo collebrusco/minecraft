@@ -28,7 +28,7 @@ void WorldRenderer::update(World const& world) {
     Chunk*const* buf = world.renderdata();
     for (ITER_WORLD_BUF(i)) {
         if (buf[i]->is_marked()) {
-            renderers[i].update(*(buf[i]));
+            renderers[i].update(*(buf[i]), world);
         }
     }
 }

@@ -8,6 +8,7 @@
 #include <vector>
 #include <flgl.h>
 #include "data/Chunk.h"
+#include "data/World.h"
 #include "data/Blocks.h"
 
 struct ChunkRenderer {
@@ -29,7 +30,7 @@ struct ChunkRenderer {
     void destroy();
 
     void attach() const;
-    bool update(Chunk const& chunk);
+    bool update(Chunk const& chunk, World const& world);
     void buffer();
     static void sync(Camera const& cam);
 

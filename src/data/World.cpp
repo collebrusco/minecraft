@@ -10,7 +10,7 @@ World::ChunkStore::~ChunkStore() {
         delete pair.second;
     }
     map.clear();
-    LOG_INF("chunks freed: %lu allocs leftover", nallocs);
+    // LOG_INF("chunks freed: %lu allocs leftover", nallocs);
 }
 
 Chunk *World::ChunkStore::get(cpos_t pos) {
@@ -26,19 +26,19 @@ Chunk const* World::ChunkStore::get(cpos_t pos) const {
 }
 
 
-Chunk *World::ChunkStore::gen(cpos_t pos, WorldGenerator const &gen) {
+Chunk *World::ChunkStore::gen(cpos_t pos, World& world) {
     map_it_t it = map.find(pos);
     if (it != map.end()) return 0;
     Chunk* chunk = new Chunk(pos);
     nallocs++;
     map.insert({pos, chunk});
-    gen.gen_chunk(pos, chunk);
+    world.generator.gen_chunk(pos, chunk, world);
     return chunk;
 }
 
-Chunk *World::ChunkStore::get_or_gen(cpos_t pos, WorldGenerator const &gen) {
+Chunk *World::ChunkStore::get_or_gen(cpos_t pos, World& world) {
     Chunk* r = this->get(pos);
-    if (!r) return this->gen(pos, gen);
+    if (!r) return this->gen(pos, world);
     return r;
 }
 
@@ -49,7 +49,8 @@ World::World(WorldGenerator& g) : generator(g), _center(0) {
     for (ITER_WORLD_BUFXY(i)) {
         for (ITER_WORLD_BUFXY(j)) {
             cpos_t pos(i - (RENDER_DISTANCE_R), j - (RENDER_DISTANCE_R));
-            chunks[cpos_to_idx(pos)] = store.gen(pos, generator);
+            chunks[cpos_to_idx(pos)] = store.gen(pos, *this);
+            chunks[cpos_to_idx(pos)]->mark();
         }
     }
 }
@@ -59,7 +60,7 @@ World::~World() {
 
 Chunk *World::chunkAt(cpos_t pos) {
     Chunk* chunk = store.get(pos);
-    chunk->mark();
+    if (chunk) chunk->mark();
     return chunk;
 }
 
@@ -69,13 +70,77 @@ Chunk const *World::read_chunkAt(cpos_t pos) const {
 
 Block *World::blockAt(bpos_t pos) {
     Chunk* chunk = this->chunkAt(bpos_to_cpos(pos));
-    chunk->mark();
-    return chunk->blockAt(bpos_to_local(pos));
+    if (!chunk) return 0;
+    return blockAtLocal(bpos_to_local(pos), chunk);
 }
+
+void World::mark_adjacent_if_solid(bpos_t world_pos, Chunk* self_chunk) {
+    // LOG_INF("Checking neighbor at world_pos = (%d,%d,%d)", world_pos.x, world_pos.y, world_pos.z);
+
+    cpos_t cpos = bpos_to_cpos(world_pos);
+    // LOG_INF("that maps to cpos %d,%d", cpos.x, cpos.y);
+    Chunk* neighbor = chunkAt(cpos);
+    // LOG_INF("got neighbor %p", neighbor);
+    if (!neighbor) {
+        // LOG_INF("No neighbor chunk at cpos = (%d,%d)", cpos.x, cpos.y);
+        return;
+    }
+
+    if (neighbor == self_chunk) {
+        // LOG_INF("Neighbor chunk is same as self; skipping");
+        return;
+    }
+
+    bpos_t local = bpos_to_local(world_pos);
+    // LOG_INF("Mapped to local = (%d,%d,%d) in neighbor chunk", local.x, local.y, local.z);
+
+    Block* b = neighbor->blockAt(local);
+    if (!b) {
+        // LOG_INF("Neighbor block pointer is null");
+        return;
+    }
+
+    if (b->empty()) {
+        // LOG_INF("Neighbor block is empty");
+    } else {
+        // LOG_INF("Neighbor block is solid; marking chunk");
+        neighbor->mark();
+    }
+}
+
+Block* World::blockAtLocal(bpos_t lpos, Chunk* chunk) {
+    chunk->mark();
+
+    constexpr int CH = CHUNK_SIZE;
+    const bpos_t wpos = cpos_to_bpos(chunk->pos) + lpos;
+    // LOG_INF("Accessing local block: lpos=(%d,%d,%d), world_pos=(%d,%d,%d), chunk cpos=(%d,%d)", lpos.x, lpos.y, lpos.z, wpos.x, wpos.y, wpos.z, chunk->pos.x, chunk->pos.y);
+
+    if (lpos.x == 0)         mark_adjacent_if_solid(wpos + bpos_t{-1, 0, 0}, chunk);
+    else if (lpos.x == CH-1) mark_adjacent_if_solid(wpos + bpos_t{ 1, 0, 0}, chunk);
+    
+    if (lpos.z == 0)         mark_adjacent_if_solid(wpos + bpos_t{0, 0, -1}, chunk);
+    else if (lpos.z == CH-1) mark_adjacent_if_solid(wpos + bpos_t{0, 0,  1}, chunk);
+
+    return chunk->blockAt(lpos);
+}
+
+
+
 
 Block const *World::read_blockAt(bpos_t pos) const {
     const Chunk* chunk = this->read_chunkAt(bpos_to_cpos(pos));
+    if (!chunk) return 0;
     return chunk->blockAt(bpos_to_local(pos));
+}
+
+Block *World::blockAtNoFlag(bpos_t pos) {
+    Chunk* chunk = store.get(pos);
+    if (!chunk) return 0;
+    return chunk->blockAt(bpos_to_local(pos));
+}
+
+Block *World::blockAtLocalNoFlag(bpos_t lpos, Chunk *chunk) {
+    return chunk->blockAt(lpos);
 }
 
 World::RaycastResult World::raycast(Ray const& r, float maxlen) {
@@ -209,7 +274,7 @@ void World::shift(int dx, int dy) {
             int x = _center.x + ((dx*(RENDER_DISTANCE_R)) - (dx>0));
             size_t idx = cpos_to_idx(cpos_t(x,y));
             chunks[idx]->mark();
-            chunks[idx] = store.get_or_gen(cpos_t(x,y), generator);
+            chunks[idx] = store.get_or_gen(cpos_t(x,y), *this);
         }
     }
     _center.y += dy;
@@ -220,7 +285,7 @@ void World::shift(int dx, int dy) {
             int y = _center.y + ((dy*(RENDER_DISTANCE_R)) - (dy>0));
             size_t idx = cpos_to_idx(cpos_t(x,y));
             chunks[idx]->mark();
-            chunks[idx] = store.get_or_gen(cpos_t(x,y), generator);
+            chunks[idx] = store.get_or_gen(cpos_t(x,y), *this);
         }
     }
 }

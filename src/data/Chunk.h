@@ -19,12 +19,13 @@ struct Block {
 struct Chunk {
     Chunk(cpos_t pos);
     cpos_t pos;
-    Block* blockAt(bpos_t local);
     Block const* blockAt(bpos_t local) const;
     inline void mark(bool m = true) {flag = m;}
     inline bool is_marked() const {return flag;}
     inline glm::mat4 const& get_model() const {return model;}
 private:
+friend struct World;
+    Block* blockAt(bpos_t local);
     const glm::mat4 model;
     bool flag;
     struct BlockStore {

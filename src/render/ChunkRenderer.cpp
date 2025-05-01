@@ -86,58 +86,49 @@ void ChunkRenderer::attach() const {
     instance_buffer.unbind();
 }
 
-bool ChunkRenderer::update(Chunk const &chunk) {
+bool ChunkRenderer::update(Chunk const& chunk, World const& world) {
     model = chunk.get_model();
     instance_data.clear();
-    for (int y = 0; y < MAX_HEIGHT; y++) {
-        for (int z = 0; z < CHUNK_SIZE; z++) {
-            for (int x = 0; x < CHUNK_SIZE; x++) {
-                const bpos_t local{x,y,z};
+
+    const cpos_t cpos = chunk.pos;
+    const bpos_t chunk_origin = cpos_to_bpos(cpos);
+
+    for (int y = 0; y < MAX_HEIGHT; ++y) {
+        for (int z = 0; z < CHUNK_SIZE; ++z) {
+            for (int x = 0; x < CHUNK_SIZE; ++x) {
+                const bpos_t local{x, y, z};
                 assert(bpos_is_local(local));
-                Block const* b = chunk.blockAt(local);
-                if (b && !b->empty()) {
-                    bpos_t near = local;
-                    near += V3_UP;
-                    Block const* test = chunk.blockAt(near);
-                    if (!bpos_is_local(near) || test->empty()) {
-                        emit_face(TOP, b->type->faces[TOP].face, local.x, local.y, local.z);
+
+                const Block* b = chunk.blockAt(local);
+                if (!b || b->empty()) continue;
+
+                for (int i = 0; i <= ORIENTATION_LAST; ++i) {
+                    const orientation_e face = static_cast<orientation_e>(i);
+                    const bpos_t dir = IDIRECTIONS[i];
+                    const bpos_t near_local = local + dir;
+
+                    const Block* test = nullptr;
+
+                    if (bpos_is_local(near_local)) {
+                        test = chunk.blockAt(near_local);
+                    } else {
+                        bpos_t world_pos = chunk_origin + near_local;
+                        test = world.read_blockAt(world_pos);
                     }
-                    near = local;
-                    near += V3_DOWN;
-                    test = chunk.blockAt(near);
-                    if (!bpos_is_local(near) || test->empty()) {
-                        emit_face(BOT, b->type->faces[BOT].face, local.x, local.y, local.z);
-                    }
-                    near = local;
-                    near += V3_EAST;
-                    test = chunk.blockAt(near);
-                    if (!bpos_is_local(near) || test->empty()) {
-                        emit_face(EAST, b->type->faces[EAST].face, local.x, local.y, local.z);
-                    }
-                    near = local;
-                    near += V3_WEST;
-                    test = chunk.blockAt(near);
-                    if (!bpos_is_local(near) || test->empty()) {
-                        emit_face(WEST, b->type->faces[WEST].face, local.x, local.y, local.z);
-                    }
-                    near = local;
-                    near += V3_NORTH;
-                    test = chunk.blockAt(near);
-                    if (!bpos_is_local(near) || test->empty()) {
-                        emit_face(NORTH, b->type->faces[NORTH].face, local.x, local.y, local.z);
-                    }
-                    near = local;
-                    near += V3_SOUTH;
-                    test = chunk.blockAt(near);
-                    if (!bpos_is_local(near) || test->empty()) {
-                        emit_face(SOUTH, b->type->faces[SOUTH].face, local.x, local.y, local.z);
+
+                    if (!test || test->empty()) {
+                        emit_face(face, b->type->faces[i].face, local.x, local.y, local.z);
                     }
                 }
             }
         }
     }
+
     return true;
 }
+
+
+
 void ChunkRenderer::buffer() {
     VertexArray::unbind();
     instance_buffer.bind();
