@@ -5,25 +5,13 @@ in  vec3 iNorm;
 in  vec2 iUV; 
 
 uniform sampler2D uTex;
+uniform vec3 uLightdir;
 
 
 void main(){
-    vec2 UV = iUV; 
-    //UV.x = 1. - UV.x;
-    UV.y = 1. - UV.y;
-
-   outColor = texture(uTex, UV);
-   //outColor = vec4(iUV, 0., 1.);
-   // vec3 c = iNorm;
-   // if (c.r < -0.1) {
-   //     c.r = 1.; c.b = 1.;
-   // }
-   // if (c.g < -0.1) {
-   //     c.g = 1.; c.r = 1.;
-   // }
-   // if (c.b < -0.1) {
-   //     c.b = 1.; c.y = 1.;
-   // }
-   // outColor = vec4(c, 1.);
-    //outColor = vec4(1.);
+    vec2 UV = iUV; UV.y = 1. - UV.y;
+    vec4 base = texture(uTex, UV);
+    vec4 kd = base * max(0.,dot(-uLightdir, iNorm));
+    vec4 ka = base * 0.22;
+    outColor = ka + kd;
 }

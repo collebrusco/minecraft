@@ -1,5 +1,6 @@
 #include "EntityRenderer.h"
 #define QUAD (0.5f)
+using namespace glm;
 
 VertexArray EntityRenderer::vao;
 VertexBuffer<Vt_pun> EntityRenderer::vbo;
@@ -123,4 +124,5 @@ void EntityRenderer::render(Stopwatch const& timer,glm::vec3 pos, glm::vec3 rota
 void EntityRenderer::sync(Camera &cam){
     entity_shader.bind();
     entity_shader.uViewProj(cam.view(), cam.proj());
+    entity_shader.uVec3("uLightdir", glm::normalize(vec3{-1., -8., -2.})); /* TODO get from world */
 }
