@@ -26,7 +26,7 @@ struct Application : public Driver {
     virtual void user_render() override final;
     virtual void user_destroy() override final;
 
-    BasicWorldGen wgen;
+    PerlinWorldGen wgen;
 
     State state;
     StateDriver driver;

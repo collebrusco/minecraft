@@ -66,6 +66,7 @@ struct World : public ECS<> {
     inline cpos_t center() const {return _center;}
     void shift(int dx, int dy);
     void shift_to(cpos_t center);
+    void load_batch(size_t n);
 
     inline Chunk*const* renderdata() const {return &chunks[0];}
 private:
@@ -88,6 +89,7 @@ friend struct ChunkStore;
     WorldGenerator& generator;
     cpos_t _center;
     Chunk* chunks[RENDER_DISTANCE * RENDER_DISTANCE];
+    cpos_t desired_chunks[RENDER_DISTANCE * RENDER_DISTANCE];
 };
 
 

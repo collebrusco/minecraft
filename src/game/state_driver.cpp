@@ -86,6 +86,7 @@ void CameraControlSystem::execute(State& state) {
     if (cpos != state.center()) {
         state.shift_to(cpos);
     }
+    state.load_batch(3);
 
     state.camera.update();
 }

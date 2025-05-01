@@ -63,6 +63,14 @@ bool bpos_is_local(bpos_t const &bpos) {
            (bpos.x < CHUNK_SIZE) && (bpos.z < CHUNK_SIZE) && bpos.y < MAX_HEIGHT;
 }
 
+bool bpos_is_valid(bpos_t const &bpos) {
+    return (bpos.y >= 0) && (bpos.y < MAX_HEIGHT);
+}
+
+bool pos_is_valid(pos_t const &pos) {
+    return (pos.y >= 0.f) && (pos.y < MAX_HEIGHT_F);
+}
+
 bpos_t bpos_to_local(bpos_t const &global) {
-    return {index_mod(global.x, CHUNK_SIZE), index_mod(global.y, MAX_HEIGHT), index_mod(global.z, CHUNK_SIZE)};
+    return {index_mod(global.x, CHUNK_SIZE), global.y, index_mod(global.z, CHUNK_SIZE)};
 }
