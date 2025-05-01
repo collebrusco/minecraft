@@ -16,6 +16,7 @@ Texture ChunkRenderer::texture;
 static_assert((HEIGHT_BITS + X_BITS + Y_BITS + ORIENT_BITS + TEX_BITS) == 32);
 static_assert((1<<X_BITS) == (1<<Y_BITS) && (1<<X_BITS) == CHUNK_SIZE);
 static_assert((1<<HEIGHT_BITS) == MAX_HEIGHT);
+static_assert((1<<TEX_BITS) >= 4096);
 
 union instance_u {
     struct _PACKED_ instance_data {
