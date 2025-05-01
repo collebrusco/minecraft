@@ -81,6 +81,14 @@ void Application::user_render() {
         glFinish();
         dbui.tren.stop();
 
+    /** TODO remove this temp entity demo */
+    SteveModel steve; steve.setT(launch_timer().read());
+    CreeperModel creep; creep.setT(launch_timer().read());
+
+    EntityRenderer::sync(state.camera);
+    EntityRenderer::render(steve, {12, 8, 14});
+    EntityRenderer::render(creep, {14, 8, 14});
+
 
     World::RaycastResult const& cast = state.getComp<c_LineOfSight>(state.player).cast;
     if (cast.hit()) {

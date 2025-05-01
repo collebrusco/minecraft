@@ -1,6 +1,31 @@
 #include "EntityModel.h"
 
-Model SteveModel::get() const{
+Texture SteveModel::texture;
+
+void EntityModel::init() {
+    SteveModel::init();
+    CreeperModel::init();
+}
+
+void EntityModel::destroy() {
+    SteveModel::destroy();
+    CreeperModel::destroy();
+}
+
+void SteveModel::init() {
+    texture = Texture::from_file("Creeper_T-Shirt");
+    texture.pixelate();
+}
+
+void SteveModel::destroy() {
+    texture.destroy();
+}
+
+void SteveModel::prepare_render() const {
+    texture.bind();
+}
+
+Model SteveModel::get() const {
     Model parts;
 
     glm::vec3 headSize(0.5f, 0.5f, 0.5f); // 8 * 1/16 etc. 
@@ -141,6 +166,23 @@ Model SteveModel::get() const{
     return parts;
 
 }
+
+Texture CreeperModel::texture;
+
+void CreeperModel::init() {
+    texture = Texture::from_file("creeper");
+    texture.pixelate();
+}
+
+void CreeperModel::destroy() {
+    texture.destroy();
+}
+
+void CreeperModel::prepare_render() const {
+    texture.bind();
+}
+
+
 Model CreeperModel::get() const{
     Model parts;
 

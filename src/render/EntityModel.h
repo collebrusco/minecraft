@@ -20,6 +20,9 @@ typedef std::vector<ModelPart> Model; /** placehold with a typedef, can become a
 struct EntityModel {
     virtual ~EntityModel() = default; /** base classes have to have virtual destructors in order to call child destructor from base reference */
     virtual Model get() const = 0; /** = 0 means abstract, const means we won't change members and can call this method from a const& */
+    virtual void prepare_render() const {}
+    static void init();
+    static void destroy();
 };
 
 typedef glm::vec2 steve_skin_t; /** maybe this is like the bot-left of a given skin on a sheet of skins */
@@ -30,8 +33,14 @@ struct SteveModel : public EntityModel {
 
     void setSkin(const steve_skin_t skin);
 
+    static void init();
+    static void destroy();
+
+    virtual void prepare_render() const override final;
+
     virtual Model get() const override final; /** final meaning no other class will inherit and override this */
 private:
+    static Texture texture;
     float t;
 };
 
@@ -41,8 +50,14 @@ struct CreeperModel : public EntityModel {
 
     void setSkin(const steve_skin_t skin);
 
+    static void init();
+    static void destroy();
+
+    virtual void prepare_render() const override final;
+
     virtual Model get() const override final; /** final meaning no other class will inherit and override this */
 private:
+    static Texture texture;
     float t;    
 };
 

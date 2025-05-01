@@ -7,12 +7,10 @@ VertexBuffer<Vt_pun> EntityRenderer::vbo;
 ElementBuffer EntityRenderer::ibo;
 
 Shader EntityRenderer::entity_shader;
-Texture EntityRenderer::texture; 
-SteveModel EntityRenderer::steve;
-CreeperModel EntityRenderer::creeper;
 
 void EntityRenderer::init(){
-   const Vt_pun cube_verts[] = {
+    EntityModel::init();
+    const Vt_pun cube_verts[] = {
        // Front face (+Z)
        {{-QUAD, -QUAD, QUAD}, {0, 0}, {0, 0, 1}}, // 0
        {{QUAD, -QUAD, QUAD}, {1, 0}, {0, 0, 1}},  // 1
@@ -64,8 +62,6 @@ void EntityRenderer::init(){
        20, 21, 22, 20, 22, 23};
    entity_shader = Shader::from_source("entity_vert", "entity_frag");
    // TODO break out into its own thing
-   texture = Texture::from_file("creeper");
-   texture.pixelate();
    vao.create_bind();
    vbo.create_bind();
    vao.attach(vbo);
@@ -82,29 +78,26 @@ void EntityRenderer::init(){
 
 void EntityRenderer::destroy(){
     // vao, vbo, ibo are created. now we destory
+    EntityModel::destroy();
     vao.destroy();
     vbo.destroy();
     ibo.destroy();
     entity_shader.destroy();
-    texture.destroy();
 }
 
-void EntityRenderer::render(Stopwatch const& timer,glm::vec3 pos, glm::vec3 rotation, glm::vec3 scale){
-    Model modelMats = creeper.get();
-    creeper.setT(timer.read());
-    //Model modelMats = steve.get();
-    //steve.setT(timer.read());
+void EntityRenderer::render(EntityModel& emodel, glm::vec3 pos, glm::vec3 rotation, glm::vec3 scale){
+    Model model = emodel.get();
     glFrontFace(GL_CCW);
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
     gl.enable_depth_test();
     entity_shader.bind();
-    texture.bind();
+    emodel.prepare_render();
 
     glm::mat4 modelmat = genModelMat3d(pos, rotation, scale);
     entity_shader.uMat4("uModel", modelmat);
     vao.bind();
-    for (ModelPart const &m : modelMats){
+    for (ModelPart const &m : model){
         entity_shader.uMat4("uModelPartMat", m.mat);
 
         glm::vec2 uvsMin[6];
