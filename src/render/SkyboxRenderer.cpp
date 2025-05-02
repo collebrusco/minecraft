@@ -60,12 +60,12 @@ void SkyboxRenderer::init() {
     vbo.unbind();
 
     /*
-    0 → POSITIVE_X
-    1 → NEGATIVE_X
-    2 → POSITIVE_Y
-    3 → NEGATIVE_Y
-    4 → POSITIVE_Z
-    5 → NEGATIVE_Z
+    0 → NEGATIVE_X
+    1 → NEGATIVE_Z
+    2 → POSITIVE_x
+    3 → POSITIVE_Z
+    4 → POSITIVE_Y
+    5 → NEGATIVE_Y
     */
     texture = Texture::from_cubemap_files(
         "cubemap/cubemap_1",
