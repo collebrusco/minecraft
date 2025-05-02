@@ -88,10 +88,12 @@ void SkyboxRenderer::sync(Camera& cam) {
 
 void SkyboxRenderer::render() {
     glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
     shader.bind();
     texture.bind();
     vao.bind();
     gl.draw_arrays(GL_TRIANGLES, 0, 36);
+    glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
 }
