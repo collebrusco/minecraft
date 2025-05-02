@@ -11,7 +11,7 @@ World::ChunkStore::~ChunkStore() {
         delete pair.second;
     }
     map.clear();
-    // LOG_INF("chunks freed: %lu allocs leftover", nallocs);
+    LOG_INF("chunks freed: %lu allocs leftover", nallocs);
 }
 
 Chunk *World::ChunkStore::get(cpos_t pos) {
@@ -49,6 +49,7 @@ Chunk *World::ChunkStore::get_or_gen(cpos_t pos, World& world) {
 #define ITER_WORLD_BUFXY(iter) int iter = 0; iter < RENDER_DISTANCE; iter++
 
 World::World(WorldGenerator& g) : generator(g), _center(0) {
+    memset(chunks, 0, sizeof(Chunk*) * RENDER_DISTANCE * RENDER_DISTANCE);
     for (ITER_WORLD_BUFXY(i)) {
         for (ITER_WORLD_BUFXY(j)) {
             cpos_t pos(i - (RENDER_DISTANCE_R), j - (RENDER_DISTANCE_R));
