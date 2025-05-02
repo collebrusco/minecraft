@@ -12,6 +12,8 @@ struct SkyboxRenderer {
 
     static Shader shader;
     static Texture texture;
+    static VertexArray vao;
+    static VertexBuffer<Vertex_3f> vbo;
     
     static void init();
     static void destroy();
