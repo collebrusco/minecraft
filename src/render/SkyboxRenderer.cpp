@@ -60,14 +60,14 @@ void SkyboxRenderer::init() {
     vbo.unbind();
 
     /*
-    0 → POSITIVE_X
-    1 → NEGATIVE_X
-    2 → POSITIVE_Y
-    3 → NEGATIVE_Y
-    4 → POSITIVE_Z
-    5 → NEGATIVE_Z
+    0 → NEGATIVE_X
+    1 → NEGATIVE_Z
+    2 → POSITIVE_x
+    3 → POSITIVE_Z
+    4 → POSITIVE_Y
+    5 → NEGATIVE_Y
     */
-    texture = Texture::from_cubemap_files("cubemap/cubemap_0", "cubemap/cubemap_1","cubemap/cubemap_2","cubemap/cubemap_3","cubemap/cubemap_4","cubemap/cubemap_5");
+    texture = Texture::from_cubemap_files("cubemap/rcubemap_0", "cubemap/rcubemap_1","cubemap/rcubemap_2","cubemap/rcubemap_3","cubemap/rcubemap_4","cubemap/rcubemap_5");
 
 
 }
