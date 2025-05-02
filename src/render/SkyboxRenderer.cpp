@@ -67,7 +67,14 @@ void SkyboxRenderer::init() {
     4 → POSITIVE_Z
     5 → NEGATIVE_Z
     */
-    texture = Texture::from_cubemap_files("cubemap/cubemap_0", "cubemap/cubemap_1","cubemap/cubemap_2","cubemap/cubemap_3","cubemap/cubemap_4","cubemap/cubemap_5");
+    texture = Texture::from_cubemap_files(
+        "cubemap/cubemap_1",
+        "cubemap/cubemap_3",
+        "cubemap/cubemap_4",
+        "cubemap/cubemap_5",
+        "cubemap/cubemap_0",
+        "cubemap/cubemap_2"
+    );
 
 
 }
@@ -83,7 +90,8 @@ void SkyboxRenderer::destroy() {
 void SkyboxRenderer::sync(Camera& cam) {
     shader.bind();
     glm::mat4 view = glm::mat4(glm::mat3(cam.view()));
-    shader.uViewProj(view, cam.proj());
+    shader.uViewProj(view,
+         cam.proj());
 }
 
 void SkyboxRenderer::render() {
