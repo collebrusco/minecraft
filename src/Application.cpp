@@ -34,6 +34,8 @@ void Application::user_create() {
 
     EntityRenderer::init();
 
+    SkyboxRenderer::init();
+
     driver.init(state);
 }
 
@@ -68,6 +70,9 @@ void Application::user_update(float dt, Keyboard const& kb, Mouse const& mouse) 
 void Application::user_render() {
     gl.set_clear_color(135./255., 206./255., 235./255.);
     gl.clear();
+
+    SkyboxRenderer::sync(state.camera);
+    SkyboxRenderer::render();
 
         glFinish();
         dbui.tcpu.start();
@@ -110,5 +115,6 @@ void Application::user_destroy() {
     WorldPointRenderer::destroy();
     WorldAxesRenderer::destroy();
     EntityRenderer::destroy();
+    SkyboxRenderer::destroy();
     wrenderer.destroy();
 }
