@@ -10,9 +10,6 @@
 #include <flgl/allocators.h>
 #include <vector>
 
-#define GUI_SCALE (4)
-#define GUI_SCALE_F (static_cast<float>(GUI_SCALE))
-
 struct UIbbox {
     bool inside(glm::vec2 mpos) const;
     void merge(UIbbox const& other);
@@ -67,6 +64,7 @@ struct UIelement {
     UIelement* hitTest(glm::vec2 mpos);
     void updateSubtreeBBox();
     void addChild(UIelement* child);
+    void offsetScaled(glm::vec2 ofs);
 };
 
 
@@ -104,7 +102,11 @@ struct UI {
     void tick(float dt, Mouse const& mouse);
     void draw() const; /** not used */
 
+    inline static void set_guiscale(uint8_t s) {guiscale = s;}
+    inline static uint8_t get_guiscale() {return guiscale;}
+    inline static float get_guiscalef() {return (float)guiscale;}
 private:
+    static uint8_t guiscale;
     UIelement* hovered = nullptr;
     UIelement* held = nullptr;
 
@@ -129,10 +131,6 @@ private:
     static size_t n_instances;
 };
 
-
-static glm::vec2 touv(glm::ivec2 pix) {
-    return ((glm::vec2)pix) / 1024.f;
-}
 
 extern const UIbbox uibb_inventory;
 extern const UIbbox uibb_heart;

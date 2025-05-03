@@ -68,14 +68,24 @@ UIbbox UIbbox::from_minsize(glm::vec2 min, glm::vec2 size) {
     return UIbbox(min, min + size);
 }
 
+
+
+
+
+
+
+
+
+uint8_t UI::guiscale;
+
 UIelement::UIelement(UIbbox const &uv) : disabled(false), render(true) {
-    size = uv.size() * 1024.f * GUI_SCALE_F;
+    size = uv.size() * 1024.f * UI::get_guiscalef();
     uvbbox = uv;
 }
 
 UIelement::UIelement() : disabled(true), render(false) {}
 
-UIelement::UIelement(glm::vec2 sz) : disabled(false), render(false), size(sz * GUI_SCALE_F) {}
+UIelement::UIelement(glm::vec2 sz) : disabled(false), render(false), size(sz * UI::get_guiscalef()) {}
 
 void UIelement::onUpdate(float) {}
 void UIelement::onMousePress(Mouse const&) {}
@@ -115,6 +125,10 @@ void UIelement::addChild(UIelement *child) {
     child->parent = this;
 }
 
+void UIelement::offsetScaled(glm::vec2 ofs) {
+    this->offset += (ofs * UI::get_guiscalef());
+}
+
 UI::UI()
 : roots{
     UIRootElement(PIN_TOPLEFT),
@@ -128,6 +142,7 @@ UI::UI()
     UIRootElement(PIN_BOTRIGHT)
 } 
 {
+    guiscale = 3;
 }
 void UI::tick(float dt, Mouse const& mouse) {
     for (UIRootElement& r : roots) {
@@ -293,6 +308,10 @@ void UIRenderer::render() {
 
 
 
+static glm::vec2 touv(glm::ivec2 pix, glm::vec2 squeeze = {0.f,0.f}) {
+    return (((glm::vec2)pix) + squeeze) / 1024.f;
+}
+
 
 
 
@@ -309,7 +328,7 @@ const UIbbox uibb_halffood = UIbbox::from_minmax(touv({9,839}), touv({18,848}));
 
 const UIbbox uibb_hotbar = UIbbox::from_minsize(touv({176,1002}), touv({182,22}));
 
-const UIbbox uibb_hotbar_select = UIbbox::from_minsize(touv({176,798}), touv({24,24}));
+const UIbbox uibb_hotbar_select = UIbbox::from_minsize(touv({177,979}), touv({22,22}));
 
 const UIbbox uibb_butpress = UIbbox::from_minsize(touv({177,958}), touv({200,20}));
 
@@ -343,10 +362,19 @@ void InventorySlot::onMouseHoverExit(Mouse const& mouse) {
 
 InventoryUIelement::InventoryUIelement(UI& home) : UIelement(uibb_inventory) {
     render = true;
-    for (size_t i = 0; i < 10; i++) {
+    for (size_t j = 0; j < 3; j++) {
+        for (size_t i = 0; i < 9; i++) {
+            UIelement* slot = home.alloc.push<InventorySlot>();
+            float x = -72.f + ((float)i * 18.f);
+            slot->offsetScaled(glm::vec2(x, -9.f - ((float)j * 18.f)));
+            this->addChild(slot);
+        }
+    }
+    for (size_t i = 0; i < 9; i++) {
         UIelement* slot = home.alloc.push<InventorySlot>();
+        float x = -72.f + ((float)i * 18.f);
+        slot->offsetScaled(glm::vec2(x, -9.f - 4.f - (3.f * 18.f)));
         this->addChild(slot);
-        slot->offset = glm::vec2((float)i - i * 20 + 10, 0.f);
     }
 }
 
