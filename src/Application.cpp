@@ -125,7 +125,17 @@ void Application::user_render() {
     UIRenderer::prepare(ui);
     UIRenderer::render();
     ui.draw();
-
+    CreeperModel creep; // shared for all
+    creep.setT(launch_timer().read()); // animate
+    EntityRenderer::sync(state.camera) ;
+    for (entID e : state.view<c_Transform, c_Mob>()) {
+        const c_Transform& tf = state.getComp<c_Transform>(e);
+        vec3 to_player = state.getComp<c_Transform>(state.player).pos - tf.pos;
+        vec2 flat_dir = normalize(vec2(to_player.x, to_player.z));
+        float yaw_deg = vectorToAngle(flat_dir);  // degrees
+        EntityRenderer::render(creep, tf.pos, {0.f, -yaw_deg, 0.f});
+    }
+     
 }
 
 void Application::user_destroy() {

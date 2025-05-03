@@ -50,4 +50,6 @@ struct c_LineOfSight {
     }
 };
 
+struct c_Mob {}; // tag only, no data
+
 #endif /* COMPONENTS_H */
