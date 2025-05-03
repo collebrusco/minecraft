@@ -22,6 +22,8 @@ void Application::user_create() {
     if (glfwRawMouseMotionSupported()) {
         glfwSetInputMode(window.id(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
     }
+    glfwSetInputMode(window.id(), GLFW_STICKY_KEYS, GLFW_FALSE);
+
     
 
     dbui.init();
