@@ -21,12 +21,12 @@ out vec2 iUV;
 #define V3_EAST    (vec3( 1.f, 0.f, 0.f))
 #define V3_WEST    (vec3(-1.f, 0.f, 0.f))
 
-#define TOP      (0)
-#define BOT      (1)
-#define NORTH    (2)
-#define SOUTH    (3)
-#define EAST     (4)
-#define WEST     (5)
+#define TOP      (0u)
+#define BOT      (1u)
+#define NORTH    (2u)
+#define SOUTH    (3u)
+#define EAST     (4u)
+#define WEST     (5u)
 
 uint orient_from_normal(vec3 norm) {
     if (norm == V3_UP) return TOP;
