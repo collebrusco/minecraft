@@ -238,42 +238,6 @@ void PerlinWorldGen::abs_gen_chunk(cpos_t cpos, Chunk* target, World& world) con
                 }
             }
 
-            //for(auto const& l : params.ore_layers){
-            //    // vein ct from random
-            //    // height of block from gaussian
-            //    // xz from random
-            //    std::uniform_int_distribution<int> vein_count_dist(l.minVeins, l.max_veins);
-            //    std::uniform_int_distribution<int> xz_dist(0, CHUNK_SIZE - 1);
-            //    std::normal_distribution<float> y_dist(l.meanY, l.stddevY);
-
-            //    int num_veins = vein_count_dist(rng);
-            //    for (int v = 0; v < num_veins; ++v)
-            //    {
-            //        int x = xz_dist(rng);
-            //        int z = xz_dist(rng);
-            //        int y = std::clamp(static_cast<int>(y_dist(rng)), 0, MAX_HEIGHT - 1);
-
-            //        for (int dx = -1; dx <= 1; ++dx)
-            //        {
-            //            for (int dy = -1; dy <= 1; ++dy)
-            //            {
-            //                for (int dz = -1; dz <= 1; ++dz)
-            //                {
-            //                    int nx = x + dx, ny = y + dy, nz = z + dz;
-            //                    if (nx < 0 || nx >= CHUNK_SIZE || ny < 0 || ny >= MAX_HEIGHT || nz < 0 || nz >= CHUNK_SIZE)
-            //                        continue;
-
-            //                    bpos_t bpos = {nx, ny, nz};
-            //                    blockID *blk = world.blockAtLocalNoFlag(bpos, target);
-            //                    if (*blk == *Blocks::STONE)
-            //                    {
-            //                        *blk = l.block;
-            //                    }
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
         }
     }
 }
