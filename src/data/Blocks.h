@@ -14,6 +14,9 @@ enum class Faces {
     DIRT,
     IRON_ORE,
     DIAMOND_ORE,
+    OAK_LOG_INTERNAL,
+    OAK_LOG_SIDE,
+    LEAF
 };
 
 struct BlockFace {
@@ -28,6 +31,8 @@ enum class Blocks {
     DIRT,
     IRON_ORE,
     DIAMOND_ORE,
+    OAK_LOG,
+    LEAF,
     LAST
 };
 static_assert((size_t)Blocks::LAST < (1ULL << (sizeof(blockID)*8)) && "too many blocks for blockID integer type");

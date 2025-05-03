@@ -152,6 +152,9 @@ void PerlinWorldGen::abs_gen_chunk(cpos_t cpos, Chunk* target, World& world) con
         }
     }
 
+    // --- 2.5 Tree generation ---
+
+
     // --- 3. Generate blocks ---
     for (int i = 0; i < CH; ++i) {
         for (int k = 0; k < CH; ++k) {
@@ -248,4 +251,64 @@ void PerlinWorldGen::abs_gen_chunk(cpos_t cpos, Chunk* target, World& world) con
 
         }
     }
+    {
+    std::uniform_int_distribution<int> tree_count_dist(0, 2);  // Up to 2 trees per chunk
+    std::uniform_int_distribution<int> xz_dist(3, CHUNK_SIZE - 4);  // Avoid chunk edges
+    std::uniform_int_distribution<int> height_dist(3, 4);  // Trunk height
+
+    int num_trees = tree_count_dist(rng);
+    for (int t = 0; t < num_trees; ++t) {
+        int tx = xz_dist(rng);
+        int tz = xz_dist(rng);
+
+        // Interpolated surface height at (tx, tz)
+        int i0 = tx / terrain_res;
+        int k0 = tz / terrain_res;
+        float txf = float(tx % terrain_res) / terrain_res;
+        float tzf = float(tz % terrain_res) / terrain_res;
+
+        float h00 = terrain_at(i0, k0);
+        float h10 = terrain_at(i0 + 1, k0);
+        float h01 = terrain_at(i0, k0 + 1);
+        float h11 = terrain_at(i0 + 1, k0 + 1);
+        float h0 = glm::mix(h00, h10, txf);
+        float h1 = glm::mix(h01, h11, txf);
+        float surface_f = glm::mix(h0, h1, tzf);
+        int surface_y = static_cast<int>(surface_f);
+
+        // Skip if out of chunk vertical bounds
+        if (surface_y < 1 || surface_y + 6 >= MAX_HEIGHT) continue;
+
+        bpos_t ground_pos = {tx, surface_y, tz};
+        blockID ground = *world.blockAtLocalNoFlag(ground_pos, target);
+
+        // Only place tree if it’s solid ground (not AIR or carved out)
+        if (ground != *Blocks::GRASS && ground != *Blocks::DIRT && ground != *Blocks::STONE)
+            continue; // Skip this tree
+
+        // Trunk
+        int tree_height = height_dist(rng);
+        for (int dy = 1; dy <= tree_height; ++dy) {
+            bpos_t pos = {tx, surface_y + dy, tz};
+            *world.blockAtLocalNoFlag(pos, target) = *Blocks::OAK_LOG;
+        }
+
+        // Leaf canopy (2 layers, 3x3 cube centered on top)
+        for (int dy = 0; dy <= 1; ++dy) {
+            int ly = surface_y + tree_height + dy;
+            for (int dx = -1; dx <= 1; ++dx) {
+                for (int dz = -1; dz <= 1; ++dz) {
+                    int lx = tx + dx;
+                    int lz = tz + dz;
+
+                    if (lx < 0 || lx >= CHUNK_SIZE || lz < 0 || lz >= CHUNK_SIZE)
+                        continue;
+
+                    bpos_t leafPos = {lx, ly, lz};
+                    *world.blockAtLocalNoFlag(leafPos, target) = *Blocks::LEAF;
+                }
+            }
+        }
+    }
+}
 }

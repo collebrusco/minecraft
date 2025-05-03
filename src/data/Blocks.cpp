@@ -40,7 +40,20 @@ static const BlockType diamond_ore ={*Blocks::DIAMOND_ORE,
                                     {Faces::DIAMOND_ORE, 0},
                                     {Faces::DIAMOND_ORE, 0},
                                     {Faces::DIAMOND_ORE, 0}}};
-
+static const BlockType oaklog ={*Blocks::OAK_LOG,
+                             {{Faces::OAK_LOG_INTERNAL, 0},
+                             {Faces::OAK_LOG_INTERNAL, 0},
+                             {Faces::OAK_LOG_SIDE, 0},
+                             {Faces::OAK_LOG_SIDE, 0},
+                             {Faces::OAK_LOG_SIDE, 0},
+                             {Faces::OAK_LOG_SIDE, 0}}};
+static const BlockType leaf = {*Blocks::LEAF,
+                              {{Faces::LEAF, 0},
+                              {Faces::LEAF, 0},
+                              {Faces::LEAF, 0},
+                              {Faces::LEAF, 0},
+                              {Faces::LEAF, 0},
+                              {Faces::LEAF, 0}}};
 /** declare new blocks here... */
 
 BlockType const *
@@ -52,7 +65,9 @@ BlockType::get(blockID id)
         &grass, 
         &dirt,
         &iron_ore,
-        &diamond_ore
+        &diamond_ore,
+        &oaklog,
+        &leaf
         /** register new blocks here... */
     };
     return (types[id]);
