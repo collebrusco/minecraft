@@ -18,6 +18,7 @@
 #include "util/DebugUI.h"
 #include "game/WorldGen.h"
 #include "render/UI.h"
+#include "render/SkyboxRenderer.h"
 
 struct Application : public Driver {
 
@@ -33,6 +34,8 @@ struct Application : public Driver {
     StateDriver driver;
 
     WorldRenderer wrenderer;
+
+    SkyboxRenderer srenderer;
 
     DebugUI dbui;
 
