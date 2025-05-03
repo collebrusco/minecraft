@@ -65,6 +65,7 @@ struct UIelement {
     void updateSubtreeBBox();
     void addChild(UIelement* child);
     void offsetScaled(glm::vec2 ofs);
+    void updateSizeFromUV();
 };
 
 
@@ -147,18 +148,37 @@ extern const UIbbox uibb_craft;
 #include "standard.h"
 #include "data/Inventory.h"
 
-struct InventorySlot : public UIelement {
+
+struct DispInventorySlot : public UIelement {
+    ItemStack stored;
+    ItemStack* grabbed;
+    DispInventorySlot();
+    virtual void draw() const override final;
+    virtual void onUpdate(float dt) override;
+};
+
+struct InventorySlot : public DispInventorySlot {
+    ItemStack* grabbed;
     InventorySlot();
+    void tell_grabbed(ItemStack& grabbed);
+    virtual void onMousePress(Mouse const& mouse) override final;
+    virtual void onMouseRelease(Mouse const& mouse) override final;
     virtual void onMouseHoverEnter(Mouse const& mouse) override final;
     virtual void onMouseHoverExit(Mouse const& mouse) override final;
+private:
 };
 
 struct InventoryUIelement : public UIelement {
 
+
     InventoryUIelement(UI& home);
 
-    static const size_t nslots = 9*(3+1);
-    ItemStack inventory[nslots];
+    InventorySlot slots[SteveInventory::nslots];
+    ItemStack grabbed;
+    UIelement disp_grabbed;
+
+    void read_inv(SteveInventory& inv);
+    void write_inv(SteveInventory& inv);
 
     virtual void onUpdate(float dt) override final;
     virtual void onMousePress(Mouse const& mouse) override final;
@@ -167,9 +187,22 @@ struct InventoryUIelement : public UIelement {
     virtual void onMouseHoverExit(Mouse const& mouse) override final;
 };
 
+struct HotbarUIelement : public UIelement {
+    DispInventorySlot slots[9];
+    UIelement selected; int iselected;
+    HotbarUIelement();
+    void read_inv(SteveInventory& inv);
+    void write_inv(SteveInventory& inv);
+    virtual void onUpdate(float dt) override final;
+};
+
 struct MinecraftUI : public UI {
     InventoryUIelement inventory;
+    HotbarUIelement hotbar;
     MinecraftUI();
+    static TextRenderer tr;
+    static void init();
+    static void destroy();
 };
 
 #endif /* UI_H */

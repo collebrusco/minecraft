@@ -1,5 +1,6 @@
 #include "player.h"
 #include "components.h"
+#include "data/Inventory.h"
 #include <flgl.h>
 LOG_MODULE(plyr);
 using namespace glm;
@@ -12,6 +13,7 @@ Player Player::spawn(World &world, pos_t pos) {
     world.addComp<c_Physics>(me);
     world.addComp<c_Cylinder>(me, c_Cylinder{0.4, 1.72, .1});
     world.addComp<c_Actor>(me).emplace<PlayerActor>();
+    world.addComp<c_PlayerInventory>(me);
     return Player{me};
 }
 
@@ -67,14 +69,22 @@ void PlayerActor::take_turn(const entID self, State& state) {
     /** move */
     state.addOrGetComp<c_Physics>(self).ofs = move;
 
+
+    if (!state.player_look) return;
+    c_PlayerInventory& inv = state.getComp<c_PlayerInventory>(self);
     if (window.mouse.left().pressed && los.cast.hit()) {
         blockID* b = state.blockAt(los.cast.bpos);
+        blockID mined = *b;
         *b = *Blocks::AIR;
+        inv.add(mined);
     }
 
     if (window.mouse.right().pressed && los.cast.hit()) {
         blockID* place = state.blockAt(los.cast.bpos + IDIRECTIONS[los.cast.face]);
-        *place = *Blocks::STONE;
+        if (!inv.inv[inv.selected].empty()) {
+            *place = inv.inv[inv.selected].item;
+            inv.inv[inv.selected].count--;
+        }
     }
     
 }

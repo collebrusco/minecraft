@@ -18,7 +18,14 @@ struct ItemStack {
     inline bool full() const {return count == 64;}
 };
 
+struct SteveInventory {
+    static const size_t nslots = 9*(3+1);
+    ItemStack inv[nslots];
+    uint8_t selected;
+    void add(itemID item, uint8_t ct = 1);
+};
 
+typedef SteveInventory c_PlayerInventory;
 
 
 #endif /* INVENTORY_H */

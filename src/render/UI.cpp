@@ -126,7 +126,11 @@ void UIelement::addChild(UIelement *child) {
 }
 
 void UIelement::offsetScaled(glm::vec2 ofs) {
-    this->offset += (ofs * UI::get_guiscalef());
+    this->offset = (ofs * UI::get_guiscalef());
+}
+
+void UIelement::updateSizeFromUV() {
+    size = uvbbox.size() * 1024.f * UI::get_guiscalef();
 }
 
 UI::UI()
@@ -156,6 +160,7 @@ void UI::tick(float dt, Mouse const& mouse) {
             for (UIelement* c : e->children)
                 stack.push_back(c);
         }
+        r.updateSubtreeBBox();
     }
     
 
@@ -169,8 +174,8 @@ void UI::tick(float dt, Mouse const& mouse) {
     }
 
     // Handle mouse press/release
-    if (mouse.left().pressed && hovered)  hovered->onMousePress(mouse);
-    if (mouse.left().released && hovered) hovered->onMouseRelease(mouse);
+    if ((mouse.left().pressed || mouse.right().pressed) && hovered)  hovered->onMousePress(mouse);
+    if ((mouse.left().released || mouse.right().pressed) && hovered) hovered->onMouseRelease(mouse);
 }
 
 void UI::draw() const {
@@ -178,7 +183,9 @@ void UI::draw() const {
         std::vector<UIelement const*> stack{&r};
         while (!stack.empty()) {
             UIelement const* e = stack.back(); stack.pop_back();
-            e->draw();
+            if (e->disabled) continue;
+            if (e->render)
+                e->draw();
             for (auto* c : e->children) stack.push_back(c);
         }
     }
@@ -343,47 +350,129 @@ const UIbbox uibb_craft = UIbbox::from_minsize(touv({728,858}), touv({176,166}))
 
 
 
+#include "data/Blocks.h"
 
 
-
-InventorySlot::InventorySlot() : UIelement(uibb_hotbar_select) {
+DispInventorySlot::DispInventorySlot() : UIelement(uibb_hotbar_select) {
     render = false;
+    grabbed = 0;
+    size = glm::vec2(16.f) * UI::get_guiscalef();
+}
+
+InventorySlot::InventorySlot() {
+}
+
+void InventorySlot::tell_grabbed(ItemStack& g) {
+    grabbed = &g;
+}
+
+void DispInventorySlot::onUpdate(float dt) {
+    if (stored.empty()) {
+        render = false;
+    } else {
+        render = true;
+        int face = (int)BlockType::get(stored.item)->faces[WEST].face;
+        uvbbox = UIbbox::from_minsize(touv({face * 16 ,0}),touv({16,16}));
+        updateSizeFromUV();
+    }
+
 }
 
 void InventorySlot::onMouseHoverEnter(Mouse const& mouse) {
-    render = true;
 }
 
 void InventorySlot::onMouseHoverExit(Mouse const& mouse) {
-    render = false;
+}
+
+void InventorySlot::onMousePress(Mouse const& mouse) {
+    if (mouse.left().down) {
+        ItemStack temp = *grabbed;
+        *grabbed = stored;
+        stored = temp;
+    } else if (mouse.right().down &&
+               (grabbed->item == stored.item || stored.empty()) &&
+               !stored.full() &&
+               !grabbed->empty()) 
+    {
+        grabbed->count--;
+        stored.item = grabbed->item;
+        stored.count++;
+    }
+}
+
+void InventorySlot::onMouseRelease(Mouse const& mouse) {
+}
+
+void DispInventorySlot::draw() const {
+    if (!disabled && render && stored.count > 1) {
+        MinecraftUI::tr.set_text("%d", (int)stored.count);
+        MinecraftUI::tr.render(
+            bbox.max().x - UI::get_guiscale() * (stored.count < 10 ? 6 : 9), 
+            (window.frame.y - bbox.min().y) - 2 * UI::get_guiscale(), 
+            max(2, (int)UI::get_guiscale() / 2)
+        );
+    }
 }
 
 
 
 InventoryUIelement::InventoryUIelement(UI& home) : UIelement(uibb_inventory) {
     render = true;
+    size_t top = 0;
+    for (size_t i = 0; i < 9; i++) {
+        UIelement* slot = &slots[top++];
+        float x = -72.f + ((float)i * 18.f);
+        slot->offsetScaled(glm::vec2(x, -9.f - 4.f - (3.f * 18.f)));
+        this->addChild(slot);
+    }
     for (size_t j = 0; j < 3; j++) {
         for (size_t i = 0; i < 9; i++) {
-            UIelement* slot = home.alloc.push<InventorySlot>();
+            UIelement* slot = &slots[top++];
             float x = -72.f + ((float)i * 18.f);
             slot->offsetScaled(glm::vec2(x, -9.f - ((float)j * 18.f)));
             this->addChild(slot);
         }
     }
-    for (size_t i = 0; i < 9; i++) {
-        UIelement* slot = home.alloc.push<InventorySlot>();
-        float x = -72.f + ((float)i * 18.f);
-        slot->offsetScaled(glm::vec2(x, -9.f - 4.f - (3.f * 18.f)));
-        this->addChild(slot);
-    }
+    assert(top == SteveInventory::nslots);
+    disp_grabbed = UIelement(touv({16,16}));
+    disp_grabbed.updateSizeFromUV();
+    disp_grabbed.disabled = true;
+    disp_grabbed.render = false;
+    this->addChild(&disp_grabbed);
 }
 
 void InventoryUIelement::onUpdate(float dt) {
-
+    for (size_t i = 0; i < SteveInventory::nslots; i++) {
+        slots[i].tell_grabbed(grabbed);
+    }
+    if (grabbed.empty()) {
+        disp_grabbed.disabled = true;
+        disp_grabbed.render = false;
+    } else {
+        disp_grabbed.disabled = false;
+        disp_grabbed.render = true;
+        int face = (int)BlockType::get(grabbed.item)->faces[WEST].face;
+        disp_grabbed.uvbbox = UIbbox::from_minsize(touv({face * 16 ,0}),touv({16,16}));
+        disp_grabbed.updateSizeFromUV();
+        glm::vec2 mp = window.mouse.pos; mp.y = window.frame.y - mp.y;
+        disp_grabbed.offset = mp - (((glm::vec2)window.frame)/2.f);
+    }
 }
 
-void InventoryUIelement::onMousePress(Mouse const& mouse) {
+void InventoryUIelement::read_inv(SteveInventory& inv) {
+    for (size_t i = 0; i < SteveInventory::nslots; i++) {
+        slots[i].stored = inv.inv[i];
+    }
+}
 
+void InventoryUIelement::write_inv(SteveInventory& inv) {
+    for (size_t i = 0; i < SteveInventory::nslots; i++) {
+        inv.inv[i] = slots[i].stored;
+    }
+}
+
+
+void InventoryUIelement::onMousePress(Mouse const& mouse) {
 }
 
 void InventoryUIelement::onMouseRelease(Mouse const& mouse) {
@@ -398,19 +487,64 @@ void InventoryUIelement::onMouseHoverExit(Mouse const& mouse) {
 
 }
 
+HotbarUIelement::HotbarUIelement() : UIelement(uibb_hotbar) {
+    for (size_t i = 0; i < 9; i++) {
+        UIelement* slot = &slots[i];
+        float x = -80.f + ((float)i * 20.f);
+        slot->offsetScaled(glm::vec2(x, 0.));
+        this->addChild(slot);
+    }
+    selected = UIelement(uibb_hotbar_select);
+    this->addChild(&selected);
+    selected.offsetScaled({-80.f,0.});
+    iselected = 0;
+}
+
+void HotbarUIelement::read_inv(SteveInventory &inv)
+{
+    for (size_t i = 0; i < 9; i++) {
+        slots[i].stored = inv.inv[i];
+    }
+}
+
+void HotbarUIelement::write_inv(SteveInventory &inv)
+{
+    inv.selected = this->iselected;
+}
+
+void HotbarUIelement::onUpdate(float dt) {
+    if (window.mouse.scroll.y > 0.f && window.mouse.scroll_last.y == 0.f) {
+        iselected = (iselected+1) % 10;
+        selected.offsetScaled({-80.f+((float)iselected)*20.f,0.});
+    }
+    if (window.mouse.scroll.y < -0.f && window.mouse.scroll_last.y == 0.f) {
+        iselected = (((iselected-1) % 10)+10)%10;
+        selected.offsetScaled({-80.f+((float)iselected)*20.f,0.});
+    }
+}
 
 
 
 
 
-
-
-
-
+TextRenderer MinecraftUI::tr;
 
 MinecraftUI::MinecraftUI() : UI(), inventory(*this) {
     roots[PIN_CENTERCENTER].addChild(&inventory);
+    roots[PIN_BOTCENTER].addChild(&hotbar);
+    hotbar.offsetScaled(glm::vec2(0.f, 11.f));
 }
 
+void MinecraftUI::init() {
+    LOG_INF("INIT TR");
+    tr.init_text_rendering();
+    tr.init();
+    tr.set_text("-");
+}
+
+void MinecraftUI::destroy() {
+    tr.destroy();
+    tr.destroy_text_rendering();
+}
 
 
