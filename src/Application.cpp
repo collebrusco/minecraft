@@ -34,6 +34,8 @@ void Application::user_create() {
 
     EntityRenderer::init();
 
+    UIRenderer::init("ui");
+
     driver.init(state);
 }
 
@@ -63,6 +65,7 @@ void Application::user_update(float dt, Keyboard const& kb, Mouse const& mouse) 
     dbui.teng.stop();
     driver.tickC(state, dt);
 
+    ui.tick(dt, mouse);
 }
 
 void Application::user_render() {
@@ -86,6 +89,7 @@ void Application::user_render() {
         dbui.tren.stop();
 
 
+
     World::RaycastResult const& cast = state.getComp<c_LineOfSight>(state.player).cast;
     if (cast.hit()) {
         OutlineRenderer::sync(state.camera);
@@ -99,6 +103,9 @@ void Application::user_render() {
         dbui.tall.stop();
         dbui.tick(dt(), state.camera.readPos());
 
+    UIRenderer::prepare(ui);
+    UIRenderer::render();
+
 }
 
 void Application::user_destroy() {
@@ -110,5 +117,6 @@ void Application::user_destroy() {
     WorldPointRenderer::destroy();
     WorldAxesRenderer::destroy();
     EntityRenderer::destroy();
+    UIRenderer::destroy();
     wrenderer.destroy();
 }
