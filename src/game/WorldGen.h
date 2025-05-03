@@ -47,6 +47,16 @@ struct PerlinWorldGen : public WorldGenerator {
         };
         std::vector<CaveLayer> cave_layers;
     
+        struct OreLayer {
+            float threshold;             // Perlin threshold to spawn ore
+            float amplitude;             // Perlin amplitude
+            glm::vec3 frequency;         // anisotropic x,y,z
+            blockID block;        
+            int minY;
+            int maxY;              
+
+        }; 
+        std::vector<OreLayer> ore_layers;
         // Cave behavior
         float cave_threshold = 0.3f; // lower = more caves
         int cave_resolution = 8;     // controls interpolation block size
@@ -62,7 +72,7 @@ struct PerlinWorldGen : public WorldGenerator {
 private:
     int terrain_nx = 0;
     int cave_nx = 0, cave_ny = 0, cave_nz = 0;
-
+    int ore_nx = 0, ore_ny = 0, ore_nz = 0;
     mutable std::vector<float> terrain_lowres;
     mutable std::vector<float> cave_field;
 

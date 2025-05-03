@@ -25,15 +25,34 @@ static const BlockType dirt  = {*Blocks::DIRT,
                                 {Faces::DIRT, 0},
                                 {Faces::DIRT, 0},
                                 {Faces::DIRT, 0}}};
+static const BlockType iron_ore = {*Blocks::IRON_ORE,
+                                   {{Faces::IRON_ORE, 0},
+                                    {Faces::IRON_ORE, 0},
+                                    {Faces::IRON_ORE, 0},
+                                    {Faces::IRON_ORE, 0},
+                                    {Faces::IRON_ORE, 0},
+                                    {Faces::IRON_ORE, 0}}};
+
+static const BlockType diamond_ore ={*Blocks::DIAMOND_ORE,
+                                    {{Faces::DIAMOND_ORE, 0},
+                                    {Faces::DIAMOND_ORE, 0},
+                                    {Faces::DIAMOND_ORE, 0},
+                                    {Faces::DIAMOND_ORE, 0},
+                                    {Faces::DIAMOND_ORE, 0},
+                                    {Faces::DIAMOND_ORE, 0}}};
 
 /** declare new blocks here... */
 
-BlockType const* BlockType::get(blockID id) {
+BlockType const *
+BlockType::get(blockID id)
+{
     static const BlockType* types[] = {
         0,        
         &stone, 
         &grass, 
         &dirt,
+        &iron_ore,
+        &diamond_ore
         /** register new blocks here... */
     };
     return (types[id]);

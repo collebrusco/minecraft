@@ -72,8 +72,16 @@ PerlinWorldGen::PerlinWorldGen() {
         0.4f,
         glm::vec3{16.f, 8.f, 16.f}
     });
+    // ⛏️ Add ore layers here:
 
-    params.cave_threshold = 0.1f;    // lower = more caves
+    params.ore_layers.push_back({
+        0.6f,
+        1.0f,
+        glm::vec3{16.f, 8.f, 16.f},
+        *Blocks::IRON_ORE,
+        16,64
+    });
+    params.cave_threshold = 0.4f;    // higher = more caves
     params.cave_resolution = 8;      // 8-block spacing in each dim
     params.terrain_resolution = 4;   // 4-block spacing for heightmap
     init();
@@ -84,9 +92,41 @@ void PerlinWorldGen::init() {
     cave_ny = MAX_HEIGHT / params.cave_resolution + 1;
     cave_nz = CHUNK_SIZE / params.cave_resolution + 1;
 
+    
     terrain_lowres.resize(terrain_nx * terrain_nx);
     cave_field.resize(cave_nx * cave_ny * cave_nz);
+
 }
+inline float trilinear_sample_ore(const float* noise,
+    int nx, int ny, int nz,
+    int x, int y, int z,
+    int res) {
+int xi = x / res, yi = y / res, zi = z / res;
+float fx = float(x % res) / res;
+float fy = float(y % res) / res;
+float fz = float(z % res) / res;
+
+int stride_y = ny;
+int stride_z = nz;
+
+int idx000 = xi * stride_y * stride_z + yi * stride_z + zi;
+int idx100 = (xi+1) * stride_y * stride_z + yi * stride_z + zi;
+int idx010 = xi * stride_y * stride_z + (yi+1) * stride_z + zi;
+int idx110 = (xi+1) * stride_y * stride_z + (yi+1) * stride_z + zi;
+int idx001 = xi * stride_y * stride_z + yi * stride_z + (zi+1);
+int idx101 = (xi+1) * stride_y * stride_z + yi * stride_z + (zi+1);
+int idx011 = xi * stride_y * stride_z + (yi+1) * stride_z + (zi+1);
+int idx111 = (xi+1) * stride_y * stride_z + (yi+1) * stride_z + (zi+1);
+
+float c00 = glm::mix(noise[idx000], noise[idx100], fx);
+float c10 = glm::mix(noise[idx010], noise[idx110], fx);
+float c01 = glm::mix(noise[idx001], noise[idx101], fx);
+float c11 = glm::mix(noise[idx011], noise[idx111], fx);
+float c0 = glm::mix(c00, c10, fy);
+float c1 = glm::mix(c01, c11, fy);
+return glm::mix(c0, c1, fz);
+}
+
 void PerlinWorldGen::abs_gen_chunk(cpos_t cpos, Chunk* target, World& world) const {
     constexpr int CH = CHUNK_SIZE;
     constexpr int HMAX = MAX_HEIGHT;
@@ -186,6 +226,26 @@ void PerlinWorldGen::abs_gen_chunk(cpos_t cpos, Chunk* target, World& world) con
                     *blk = *Blocks::DIRT;
                 else
                     *blk = *Blocks::STONE;
+                
+                if (*blk != *Blocks::STONE)
+                    continue;
+
+                for (const auto &layer : params.ore_layers)
+                {
+                    if (j < layer.minY || j > layer.maxY)
+                        continue;
+                
+                        float val = layer.amplitude * perlin3.perlin(
+                            glm::vec3(base.x + i, j, base.z + k),
+                            glm::vec3(0.f),
+                            layer.frequency);
+                
+                    if (val > layer.threshold)
+                    {
+                        *blk = layer.block;
+                        break; // Don't place multiple ores
+                    }
+                }
             }
         }
     }
