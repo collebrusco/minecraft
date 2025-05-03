@@ -74,12 +74,20 @@ PerlinWorldGen::PerlinWorldGen() {
         glm::vec3{16.f, 8.f, 16.f}
     });
 
+    // Register Ore layers here
      params.ore_layers.push_back({
          *Blocks::IRON_ORE,
          16, 10.f, // Mean and stddev of ore placement
          0, 3,
          4,10,
          {0.4f, 0.3f, 0.2f, 0.1f}
+     });
+     params.ore_layers.push_back({
+        *Blocks::DIAMOND_ORE,
+        8,3.f,
+        0,2,
+        2,6,
+        {0.4f, 0.3f, 0.2f, 0.1f}
      });
     params.cave_threshold = 0.4f;    // higher = more caves
     params.cave_resolution = 8;      // 8-block spacing in each dim
