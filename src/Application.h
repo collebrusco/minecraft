@@ -17,6 +17,7 @@
 #include "render/WorldRenderer.h"
 #include "util/DebugUI.h"
 #include "game/WorldGen.h"
+#include "render/UI.h"
 
 struct Application : public Driver {
 
@@ -34,6 +35,8 @@ struct Application : public Driver {
     WorldRenderer wrenderer;
 
     DebugUI dbui;
+
+    MinecraftUI ui;
 
 };
 

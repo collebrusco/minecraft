@@ -34,7 +34,12 @@ void Application::user_create() {
 
     EntityRenderer::init();
 
+    UIRenderer::init("ui");
+
     driver.init(state);
+
+    ui.init();
+    ui.inventory.disabled = true;
 }
 
 void Application::user_update(float dt, Keyboard const& kb, Mouse const& mouse) { (void)kb; (void)mouse;
@@ -51,6 +56,7 @@ void Application::user_update(float dt, Keyboard const& kb, Mouse const& mouse) 
         static bool mg = true;
         mg = !mg;
         state.set_playerlook(mg);
+        ui.inventory.disabled = mg;
     }
 
     if (window.keyboard[GLFW_KEY_C].pressed) {
@@ -63,6 +69,12 @@ void Application::user_update(float dt, Keyboard const& kb, Mouse const& mouse) 
     dbui.teng.stop();
     driver.tickC(state, dt);
 
+    c_PlayerInventory& inv = state.getComp<c_PlayerInventory>(state.player);
+    ui.hotbar.read_inv(inv);
+    ui.inventory.read_inv(inv);
+    ui.tick(dt, mouse);
+    ui.inventory.write_inv(inv);
+    ui.hotbar.write_inv(inv);
 }
 
 void Application::user_render() {
@@ -86,6 +98,7 @@ void Application::user_render() {
         dbui.tren.stop();
 
 
+
     World::RaycastResult const& cast = state.getComp<c_LineOfSight>(state.player).cast;
     if (cast.hit()) {
         OutlineRenderer::sync(state.camera);
@@ -99,16 +112,22 @@ void Application::user_render() {
         dbui.tall.stop();
         dbui.tick(dt(), state.camera.readPos());
 
+    UIRenderer::prepare(ui);
+    UIRenderer::render();
+    ui.draw();
+
 }
 
 void Application::user_destroy() {
     driver.destroy();
     dbui.destroy();
+    ui.destroy();
     TextRenderer::destroy_text_rendering();
     ChunkRenderer::destroy_chunk_rendering();
     PointRenderer::destroy();
     WorldPointRenderer::destroy();
     WorldAxesRenderer::destroy();
     EntityRenderer::destroy();
+    UIRenderer::destroy();
     wrenderer.destroy();
 }
