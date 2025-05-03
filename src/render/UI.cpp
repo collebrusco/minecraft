@@ -536,7 +536,6 @@ MinecraftUI::MinecraftUI() : UI(), inventory(*this) {
 }
 
 void MinecraftUI::init() {
-    LOG_INF("INIT TR");
     tr.init_text_rendering();
     tr.init();
     tr.set_text("-");

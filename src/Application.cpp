@@ -19,6 +19,10 @@ Application::Application() : state(wgen) {
 void Application::user_create() {
     gl.init();
     window.create("minecraft", 1280, 720);
+    if (glfwRawMouseMotionSupported()) {
+        glfwSetInputMode(window.id(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+    }
+    
 
     dbui.init();
 

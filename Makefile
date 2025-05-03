@@ -2,8 +2,9 @@
 default:
 	mkdir -p build
 	cd build && \
-	cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Debug .. && \
+	cmake .. && \
 	make
+# for windows w/ mingw, replace the cmake line above with: 	cmake -G "MinGW Makefiles" .. && \
 
 .PHONY: c
 c: cm
