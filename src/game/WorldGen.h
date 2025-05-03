@@ -46,16 +46,19 @@ struct PerlinWorldGen : public WorldGenerator {
             glm::vec3 frequency; // anisotropic: x, y, z
         };
         std::vector<CaveLayer> cave_layers;
-    
-        struct OreLayer {
-            float threshold;             // Perlin threshold to spawn ore
-            float amplitude;             // Perlin amplitude
-            glm::vec3 frequency;         // anisotropic x,y,z
-            blockID block;        
-            int minY;
-            int maxY;              
 
-        }; 
+        // Handles gen of Diamonds and Iron for now
+        struct OreLayer{
+            blockID block;       // Block type (e.g., iron, diamond)
+            uint32_t meanHeight; // Mean height for Gaussian distribution
+            float stddevHeight;  // Stddev for height
+
+            uint32_t minVeins, maxVeins; // Number of veins per chunk
+            uint32_t minOres, maxOres;   // Blocks per vein
+
+            std::vector<float> veinChances; // e.g. [0.4, 0.3, 0.2, 0.1] for 1–4 veins
+        };
+
         std::vector<OreLayer> ore_layers;
         // Cave behavior
         float cave_threshold = 0.3f; // lower = more caves
@@ -72,7 +75,6 @@ struct PerlinWorldGen : public WorldGenerator {
 private:
     int terrain_nx = 0;
     int cave_nx = 0, cave_ny = 0, cave_nz = 0;
-    int ore_nx = 0, ore_ny = 0, ore_nz = 0;
     mutable std::vector<float> terrain_lowres;
     mutable std::vector<float> cave_field;
 

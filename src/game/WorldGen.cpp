@@ -1,4 +1,5 @@
 #include "WorldGen.h"
+#include <random>
 LOG_MODULE(wgen);
 using namespace glm;
 
@@ -72,15 +73,14 @@ PerlinWorldGen::PerlinWorldGen() {
         0.4f,
         glm::vec3{16.f, 8.f, 16.f}
     });
-    // ⛏️ Add ore layers here:
 
-    params.ore_layers.push_back({
-        0.6f,
-        1.0f,
-        glm::vec3{16.f, 8.f, 16.f},
-        *Blocks::IRON_ORE,
-        16,64
-    });
+     params.ore_layers.push_back({
+         *Blocks::IRON_ORE,
+         16, 10.f, // Mean and stddev of ore placement
+         0, 3,
+         4,10,
+         {0.4f, 0.3f, 0.2f, 0.1f}
+     });
     params.cave_threshold = 0.4f;    // higher = more caves
     params.cave_resolution = 8;      // 8-block spacing in each dim
     params.terrain_resolution = 4;   // 4-block spacing for heightmap
@@ -97,35 +97,6 @@ void PerlinWorldGen::init() {
     cave_field.resize(cave_nx * cave_ny * cave_nz);
 
 }
-inline float trilinear_sample_ore(const float* noise,
-    int nx, int ny, int nz,
-    int x, int y, int z,
-    int res) {
-int xi = x / res, yi = y / res, zi = z / res;
-float fx = float(x % res) / res;
-float fy = float(y % res) / res;
-float fz = float(z % res) / res;
-
-int stride_y = ny;
-int stride_z = nz;
-
-int idx000 = xi * stride_y * stride_z + yi * stride_z + zi;
-int idx100 = (xi+1) * stride_y * stride_z + yi * stride_z + zi;
-int idx010 = xi * stride_y * stride_z + (yi+1) * stride_z + zi;
-int idx110 = (xi+1) * stride_y * stride_z + (yi+1) * stride_z + zi;
-int idx001 = xi * stride_y * stride_z + yi * stride_z + (zi+1);
-int idx101 = (xi+1) * stride_y * stride_z + yi * stride_z + (zi+1);
-int idx011 = xi * stride_y * stride_z + (yi+1) * stride_z + (zi+1);
-int idx111 = (xi+1) * stride_y * stride_z + (yi+1) * stride_z + (zi+1);
-
-float c00 = glm::mix(noise[idx000], noise[idx100], fx);
-float c10 = glm::mix(noise[idx010], noise[idx110], fx);
-float c01 = glm::mix(noise[idx001], noise[idx101], fx);
-float c11 = glm::mix(noise[idx011], noise[idx111], fx);
-float c0 = glm::mix(c00, c10, fy);
-float c1 = glm::mix(c01, c11, fy);
-return glm::mix(c0, c1, fz);
-}
 
 void PerlinWorldGen::abs_gen_chunk(cpos_t cpos, Chunk* target, World& world) const {
     constexpr int CH = CHUNK_SIZE;
@@ -134,6 +105,12 @@ void PerlinWorldGen::abs_gen_chunk(cpos_t cpos, Chunk* target, World& world) con
     bpos_t base = cpos_to_bpos(cpos);
     const int terrain_res = params.terrain_resolution;
     const int cave_res = params.cave_resolution;
+
+    int32_t chunk_seed = static_cast<int32_t>(seed()) 
+                   + static_cast<int32_t>(cpos.x) * 73856093 
+                   ^ static_cast<int32_t>(cpos.y) * 19349663 
+                   ^ 0xCAFEBABE;
+    std::mt19937 rng(chunk_seed);
 
     // --- 1. Fill 2D terrain lowres grid ---
     for (int i = 0; i < terrain_nx; ++i) {
@@ -227,26 +204,76 @@ void PerlinWorldGen::abs_gen_chunk(cpos_t cpos, Chunk* target, World& world) con
                 else
                     *blk = *Blocks::STONE;
                 
-                if (*blk != *Blocks::STONE)
-                    continue;
-
-                for (const auto &layer : params.ore_layers)
-                {
-                    if (j < layer.minY || j > layer.maxY)
-                        continue;
-                
-                        float val = layer.amplitude * perlin3.perlin(
-                            glm::vec3(base.x + i, j, base.z + k),
-                            glm::vec3(0.f),
-                            layer.frequency);
-                
-                    if (val > layer.threshold)
-                    {
-                        *blk = layer.block;
-                        break; // Don't place multiple ores
+            }
+            for (const auto& ore : params.ore_layers) {
+                // Choose how many veins to spawn this chunk
+                std::discrete_distribution<> vein_count_dist(
+                    ore.veinChances.begin(), ore.veinChances.end());
+            
+                int num_veins = std::clamp((int)vein_count_dist(rng), (int)ore.minVeins, (int)ore.maxVeins);
+            
+                std::normal_distribution<float> y_dist(ore.meanHeight, ore.stddevHeight);
+                std::uniform_int_distribution<int> xz_dist(0, CHUNK_SIZE - 1);
+                std::uniform_int_distribution<int> ore_count_dist(ore.minOres, ore.maxOres);
+            
+                for (int v = 0; v < num_veins; ++v) {
+                    int cx = xz_dist(rng);
+                    int cz = xz_dist(rng);
+                    int cy = std::clamp((int)y_dist(rng), 1, MAX_HEIGHT - 2);  // Clamp to valid range
+            
+                    int num_ores = ore_count_dist(rng);
+            
+                    for (int n = 0; n < num_ores; ++n) {
+                        int dx = std::clamp(cx + static_cast<int>(rng() % 3) - 1, 0, static_cast<int>(CHUNK_SIZE - 1));
+                        int dy = std::clamp(cy + static_cast<int>(rng() % 3) - 1, 0, static_cast<int>(MAX_HEIGHT - 1));
+                        int dz = std::clamp(cz + static_cast<int>(rng() % 3) - 1, 0, static_cast<int>(CHUNK_SIZE - 1));
+                        
+            
+                        bpos_t bpos = {dx, dy, dz};
+                        blockID* blk = world.blockAtLocalNoFlag(bpos, target);
+                        if (*blk == *Blocks::STONE) {
+                            *blk = ore.block;
+                        }
                     }
                 }
             }
+
+            //for(auto const& l : params.ore_layers){
+            //    // vein ct from random
+            //    // height of block from gaussian
+            //    // xz from random
+            //    std::uniform_int_distribution<int> vein_count_dist(l.minVeins, l.max_veins);
+            //    std::uniform_int_distribution<int> xz_dist(0, CHUNK_SIZE - 1);
+            //    std::normal_distribution<float> y_dist(l.meanY, l.stddevY);
+
+            //    int num_veins = vein_count_dist(rng);
+            //    for (int v = 0; v < num_veins; ++v)
+            //    {
+            //        int x = xz_dist(rng);
+            //        int z = xz_dist(rng);
+            //        int y = std::clamp(static_cast<int>(y_dist(rng)), 0, MAX_HEIGHT - 1);
+
+            //        for (int dx = -1; dx <= 1; ++dx)
+            //        {
+            //            for (int dy = -1; dy <= 1; ++dy)
+            //            {
+            //                for (int dz = -1; dz <= 1; ++dz)
+            //                {
+            //                    int nx = x + dx, ny = y + dy, nz = z + dz;
+            //                    if (nx < 0 || nx >= CHUNK_SIZE || ny < 0 || ny >= MAX_HEIGHT || nz < 0 || nz >= CHUNK_SIZE)
+            //                        continue;
+
+            //                    bpos_t bpos = {nx, ny, nz};
+            //                    blockID *blk = world.blockAtLocalNoFlag(bpos, target);
+            //                    if (*blk == *Blocks::STONE)
+            //                    {
+            //                        *blk = l.block;
+            //                    }
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
         }
     }
 }
