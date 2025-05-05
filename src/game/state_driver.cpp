@@ -51,7 +51,7 @@ void StateDriver::init(State& state) {
     state.camera.update();
 
     state.player = Player::spawn(state, {14.f,100.f,14.f}).id;
-    (void)Mob::spawn(state, {14.f, 100.f, 10.f});
+    (void)Mob::spawn(state, {23.f, 100.f, 10.f});
 
     camcontrol.set_target(state.player);
 }

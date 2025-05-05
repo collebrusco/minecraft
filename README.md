@@ -4,6 +4,8 @@ finally taking a stab at the mc clone
 Frank Collebrusco
 Arsh Guntakal
 
+We did both do the course survey. I always do them
+
 ![sc](ARTIFACTS/sc.png)
 ![scwf](ARTIFACTS/scwf.png)
 
