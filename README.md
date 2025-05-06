@@ -1,8 +1,8 @@
 # minecraft
-finally taking a stab at the mc clone   
-[cs 384g final project](https://www.cs.utexas.edu/~graphics/s25/cs354h/final/overview/)
-Frank Collebrusco
-Arsh Guntakal
+finally taking a stab at the mc clone      
+[cs 384g final project](https://www.cs.utexas.edu/~graphics/s25/cs354h/final/overview/)           
+Frank Collebrusco             
+Arsh Guntakal              
 
 ![sc](ARTIFACTS/sc.png)
 ![scwf](ARTIFACTS/scwf.png)
