@@ -1,8 +1,7 @@
 # minecraft
 finally taking a stab at the mc clone      
-[cs 384g final project](https://www.cs.utexas.edu/~graphics/s25/cs354h/final/overview/)           
-Frank Collebrusco             
-Arsh Guntakal              
+        
+I turned this in with Arsh for a [UT CS 384g final project](https://www.cs.utexas.edu/~graphics/s25/cs354h/final/overview/) at [this commit](https://github.com/collebrusco/minecraft/tree/CS-384G-release) but I've been wanting to do this long before the class project and intend to keep working on it.        
 
 ![sc](ARTIFACTS/sc.png)
 ![scwf](ARTIFACTS/scwf.png)
